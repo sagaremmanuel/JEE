@@ -396,7 +396,23 @@
                         </div>
                     </div>
                     
-                   
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="date"><i class="fas fa-calendar"></i> Preferred Date *</label>
+                            <input type="date" id="date" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="time"><i class="fas fa-clock"></i> Preferred Time Slot *</label>
+                            <select id="time" class="form-control" required>
+                                <option value="">Select time slot</option>
+                                <option value="slot1">4:00 PM - 4:45 PM</option>
+                                <option value="slot2">5:00 PM - 5:45 PM</option>
+                                <option value="slot3">6:00 PM - 6:45 PM</option>
+                                <option value="slot4">7:00 PM - 7:45 PM</option>
+                                <option value="slot5">8:00 PM - 8:45 PM</option>
+                            </select>
+                        </div>
+                    </div>
                     
                     <div class="form-group">
                         <label for="topic"><i class="fas fa-book"></i> Specific Topic or Question (Optional)</label>
@@ -407,7 +423,7 @@
                 <div class="payment-summary">
                     <h3>Payment Summary</h3>
                     <div class="price-row border-bottom">
-                        <span>Mentorship Session (1hr)</span>
+                        <span>Mentorship Session (45 mins)</span>
                         <span>₹70</span>
                     </div>
                     <div class="price-row">
@@ -435,7 +451,7 @@
         </div>
     </div>
 
-    <!-- Razorpay Script -->
+    <!-- Razorpay Script - FIXED: Removed extra spaces -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
         // Set minimum date to today
@@ -491,15 +507,24 @@
             
             // Create Razorpay options
             const options = {
-                key: 'rzp_test_RKFaiKAvJ0poqh', // Replace with your actual Razorpay key
+                key: 'rzp_test_RKFaiKAvJ0poqh', // Your actual Razorpay key
                 amount: 7000, // ₹70 in paise
                 currency: 'INR',
                 name: 'JEE Mentorship with Sagar & Sanjay',
-                description: '1hr-minute mentorship session',
+                description: '45-minute mentorship session',
                 image: 'https://via.placeholder.com/100x50?text=JEE+Logo',
                 handler: function(response) {
-                    // Payment successful - now save to Google Sheets
-                    saveToGoogleSheets(name, email, phone, className, date, time, topic, 70, response.razorpay_payment_id, formattedDate, formattedTime);
+                    console.log('Payment successful!', response);
+                    // Hide loading indicator
+                    document.getElementById('loading-indicator').classList.remove('active');
+                    document.getElementById('pay-now-btn').disabled = false;
+                    
+                    // Redirect to confirmation page (SKIPPING Google Sheets for now)
+                    window.location.href = 'confirmation.html?' + 
+                        'payment_id=' + response.razorpay_payment_id + 
+                        '&name=' + encodeURIComponent(name) + 
+                        '&date=' + encodeURIComponent(formattedDate) + 
+                        '&time=' + encodeURIComponent(formattedTime);
                 },
                 prefill: {
                     name: name,
@@ -525,51 +550,27 @@
                 }
             };
             
-            // Open Razorpay checkout
-            const rzp = new Razorpay(options);
-            rzp.open();
+            // Add error handling
+            try {
+                const rzp = new Razorpay(options);
+                
+                // Handle payment failures
+                rzp.on('payment.failed', function(response) {
+                    console.log('Payment failed:', response.error);
+                    document.getElementById('loading-indicator').classList.remove('active');
+                    document.getElementById('pay-now-btn').disabled = false;
+                    alert('Payment failed: ' + response.error.description);
+                });
+                
+                // Open the payment window
+                rzp.open();
+            } catch (error) {
+                console.error('Error initializing Razorpay:', error);
+                document.getElementById('loading-indicator').classList.remove('active');
+                document.getElementById('pay-now-btn').disabled = false;
+                alert('Error: ' + error.message);
+            }
         });
-        
-        function saveToGoogleSheets(name, email, phone, className, date, time, topic, amount, paymentId, formattedDate, formattedTime) {
-            // Create form data for Google Apps Script
-            const formData = new FormData();
-            formData.append('name', name);
-            formData.append('email', email);
-            formData.append('phone', phone);
-            formData.append('class', className);
-            formData.append('date', date);
-            formData.append('time', time);
-            formData.append('topic', topic);
-            formData.append('amount', amount);
-            formData.append('paymentId', paymentId);
-            formData.append('status', 'Confirmed');
-            
-            // YOUR GOOGLE APPS SCRIPT URL - Replace with your actual URL
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbyo4GBDGjvIKz9yRnqLZvkiZEh3PQ6ekE0SKUyu-27KeuTHCmQAnwI2uHzFS6mUaJyBQQ/exec';
-            
-            fetch(scriptURL, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-                // Redirect to confirmation page
-                window.location.href = 'confirmation.html?payment_id=' + paymentId + 
-                                     '&name=' + encodeURIComponent(name) + 
-                                     '&date=' + encodeURIComponent(formattedDate) + 
-                                     '&time=' + encodeURIComponent(formattedTime);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                // Still redirect to confirmation but show error message
-                alert('Payment successful but there was an issue saving your details. Please contact support with Payment ID: ' + paymentId);
-                window.location.href = 'confirmation.html?payment_id=' + paymentId + 
-                                     '&name=' + encodeURIComponent(name) + 
-                                     '&date=' + encodeURIComponent(formattedDate) + 
-                                     '&time=' + encodeURIComponent(formattedTime);
-            });
-        }
     </script>
 </body>
 </html>
