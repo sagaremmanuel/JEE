@@ -6,36 +6,34 @@
     <title>Mentorship Session with Sagar & Sanjay</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-            .price-tag {
-    position: absolute;
-    top: 20px;
-    right: 30px;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px); /* For Safari support */
-    padding: 8px 16px;
-    border-radius: 50px;
-    font-weight: 700;
-    font-size: 1.2rem;
-    z-index: 2;
-    color: white;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    animation: pulse 2s infinite, float 3s ease-in-out infinite;
-    transform-origin: center;
-    border: 1px solid rgba(255, 255, 255, 0.2); /* Optional: adds a subtle border */
-
-                
-}
-
-/* Keep the backdrop-filter property in all states */
-.price-tag:hover {
-    background: rgba(255, 255, 255, 0.2); /* Slightly more opaque on hover */
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    animation: pulse 0.5s ease, shake 0.5s ease;
-    transform: scale(1.15);
-}
+        .price-tag {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px); /* For Safari support */
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            z-index: 2;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            animation: pulse 2s infinite, float 3s ease-in-out infinite;
+            transform-origin: center;
+            border: 1px solid rgba(255, 255, 255, 0.2); /* Optional: adds a subtle border */
+        }
+        /* Keep the backdrop-filter property in all states */
+        .price-tag:hover {
+            background: rgba(255, 255, 255, 0.2); /* Slightly more opaque on hover */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            animation: pulse 0.5s ease, shake 0.5s ease;
+            transform: scale(1.15);
+        }
+        
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap');
         
         :root {
@@ -225,19 +223,6 @@
             border-radius: 50px;
             backdrop-filter: blur(10px);
             font-weight: 500;
-        }
-        
-        .price-tag {
-            position: absolute;
-            top: 20px;
-            right: 30px;
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            padding: 8px 16px;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 1.2rem;
-            z-index: 2;
         }
         
         .form-container {
@@ -607,7 +592,6 @@
             if (hamburger && mobileMenu) {
                 hamburger.addEventListener('click', function() {
                     mobileMenu.classList.toggle('active');
-                    
                     // Animate hamburger to X
                     hamburger.classList.toggle('active');
                 });
@@ -631,6 +615,83 @@
             }
         });
         
+        // Define the saveToGoogleSheets function
+        function saveToGoogleSheets(name, email, phone, className, date, time, topic, amount, paymentId, formattedDate, formattedTime) {
+            console.log('Saving to Google Sheets...');
+            
+            // Create form data for Google Apps Script
+            const formData = new FormData();
+            formData.append('name', name);
+            formData.append('email', email);
+            formData.append('phone', phone);
+            formData.append('class', className);
+            formData.append('date', date);
+            formData.append('time', time);
+            formData.append('topic', topic);
+            formData.append('amount', amount);
+            formData.append('paymentId', paymentId);
+            formData.append('status', 'Confirmed');
+            
+            // YOUR GOOGLE APPS SCRIPT URL
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbyo4GBDGjvIKz9yRnqLZvkiZEh3PQ6ekE0SKUyu-27KeuTHCmQAnwI2uHzFS6mUaJyBQQ/exec';
+            
+            fetch(scriptURL, {
+                method: 'POST',
+                mode: 'cors'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(text => {
+                console.log('Raw response:', text);
+                
+                // Check if response contains HTML (sign-in page)
+                if (text.includes('<html') || text.includes('Sign in') || text.includes('登录') || text.includes('signin')) {
+                    console.error('Google Apps Script requires authentication. Redirecting to confirmation page.');
+                    // Redirect to confirmation page even if Google Sheets fails
+                    window.location.href = 'https://sagaremmanuel.github.io/JEE/confirm.html?' + 
+                        'payment_id=' + paymentId + 
+                        '&name=' + encodeURIComponent(name) + 
+                        '&date=' + encodeURIComponent(formattedDate) + 
+                        '&time=' + encodeURIComponent(formattedTime);
+                    return;
+                }
+                
+                // Try to parse as JSON
+                try {
+                    const data = JSON.parse(text);
+                    console.log('Success:', data);
+                    // Redirect to confirmation page
+                    window.location.href = 'https://sagaremmanuel.github.io/JEE/confirm.html?' + 
+                        'payment_id=' + paymentId + 
+                        '&name=' + encodeURIComponent(name) + 
+                        '&date=' + encodeURIComponent(formattedDate) + 
+                        '&time=' + encodeURIComponent(formattedTime);
+                } catch (jsonError) {
+                    console.error('JSON parse error:', jsonError);
+                    // Redirect to confirmation page even if Google Sheets fails
+                    window.location.href = 'https://sagaremmanuel.github.io/JEE/confirm.html?' + 
+                        'payment_id=' + paymentId + 
+                        '&name=' + encodeURIComponent(name) + 
+                        '&date=' + encodeURIComponent(formattedDate) + 
+                        '&time=' + encodeURIComponent(formattedTime);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Redirect to confirmation page even if Google Sheets fails
+                window.location.href = 'https://sagaremmanuel.github.io/JEE/confirm.html?' + 
+                    'payment_id=' + paymentId + 
+                    '&name=' + encodeURIComponent(name) + 
+                    '&date=' + encodeURIComponent(formattedDate) + 
+                    '&time=' + encodeURIComponent(formattedTime);
+            });
+        }
+        
+        // Payment button event listener
         document.getElementById('pay-now-btn').addEventListener('click', function() {
             // Validate form
             const form = document.getElementById('registration-form');
@@ -654,11 +715,13 @@
             const email = document.getElementById('email').value;
             const phone = document.getElementById('phone').value;
             const className = document.getElementById('class').value;
+            const date = '28th September 2025'; // Fixed date
+            const time = '9:00 PM IST'; // Fixed time
             const topic = document.getElementById('topic').value || 'General JEE Preparation';
             
-            // Fixed session details
-            const fixedDate = '28th September 2025';
-            const fixedTime = '9:00 PM IST';
+            // Format date for display
+            const formattedDate = '28th September 2025';
+            const formattedTime = '9:00 PM IST';
             
             // Create Razorpay options
             const options = {
@@ -668,234 +731,38 @@
                 name: 'JEE Mentorship with Sagar & Sanjay',
                 description: '1-hour mentorship session',
                 image: 'https://via.placeholder.com/100x50?text=JEE+Logo',
-                // In your register.html, replace the handler function and saveToGoogleSheets function
-                // Replace your current handler function with this temporary version
                 handler: function(response) {
                     console.log('Payment successful!', response);
                     // Hide loading indicator
                     document.getElementById('loading-indicator').classList.remove('active');
                     document.getElementById('pay-now-btn').disabled = false;
                     
-                    // Get form data
-                    const name = document.getElementById('name').value;
-                    const email = document.getElementById('email').value;
-                    const phone = document.getElementById('phone').value;
-                    const className = document.getElementById('class').value;
-                    const date = document.getElementById('date').value;
-                    const time = document.getElementById('time').value;
-                    const topic = document.getElementById('topic').value || 'General JEE Preparation';
-                    
-                    // Format date for display
-                    const formattedDate = new Date(date).toLocaleDateString('en-IN', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    });
-                    
-                    // Map time slot to display value
-                    const timeSlots = {
-                        'slot1': '4:00 PM - 4:45 PM',
-                        'slot2': '5:00 PM - 5:45 PM',
-                        'slot3': '6:00 PM - 6:45 PM',
-                        'slot4': '7:00 PM - 7:45 PM',
-                        'slot5': '8:00 PM - 8:45 PM'
-                    };
-                    const formattedTime = timeSlots[time] || time;
-                    
-                    // TEMPORARY: Skip Google Sheets and go directly to confirmation
-                    console.log('Skipping Google Sheets for testing');
-                        window.location.href = 'https://sagaremmanuel.github.io/JEE/confirm.html?' + 
-        'payment_id=' + response.razorpay_payment_id + 
-        '&name=' + encodeURIComponent(name) + 
-        '&date=' + encodeURIComponent(formattedDate) + 
-        '&time=' + encodeURIComponent(formattedTime);
-                }
-                
-                    
-                    // Try to save to Google Sheets
+                    // Save to Google Sheets
                     saveToGoogleSheets(name, email, phone, className, date, time, topic, 70, response.razorpay_payment_id, formattedDate, formattedTime);
-                }
-                
-                // Add this function BEFORE your event listener
-                    function saveToGoogleSheets(name, email, phone, className, date, time, topic, amount, paymentId, formattedDate, formattedTime) {
-                        console.log('Saving to Google Sheets...');
-                        
-                        // Create form data for Google Apps Script
-                        const formData = new FormData();
-                        formData.append('name', name);
-                        formData.append('email', email);
-                        formData.append('phone', phone);
-                        formData.append('class', className);
-                        formData.append('date', date);
-                        formData.append('time', time);
-                        formData.append('topic', topic);
-                        formData.append('amount', amount);
-                        formData.append('paymentId', paymentId);
-                        formData.append('status', 'Confirmed');
-                        
-                        // YOUR GOOGLE APPS SCRIPT URL
-                        const scriptURL = 'https://script.google.com/macros/s/AKfycbyo4GBDGjvIKz9yRnqLZvkiZEh3PQ6ekE0SKUyu-27KeuTHCmQAnwI2uHzFS6mUaJyBQQ/exec';
-                        
-                        fetch(scriptURL, {
-                            method: 'POST',
-                            mode: 'cors'
-                        })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error(`HTTP error! status: ${response.status}`);
-                            }
-                            return response.text();
-                        })
-                        .then(text => {
-                            console.log('Raw response:', text);
-                            
-                            // Check if response contains HTML (sign-in page)
-                            if (text.includes('<html') || text.includes('Sign in') || text.includes('登录') || text.includes('signin')) {
-                                throw new Error('Google Apps Script requires authentication. Please update deployment settings to "Anyone".');
-                            }
-                            
-                            // Try to parse as JSON
-                            try {
-                                const data = JSON.parse(text);
-                                console.log('Success:', data);
-                                // Redirect to confirmation page
-                                window.location.href = 'https://sagaremmanuel.github.io/JEE/confirm.html?' + 
-                                                     'payment_id=' + paymentId + 
-                                                     '&name=' + encodeURIComponent(name) + 
-                                                     '&date=' + encodeURIComponent(formattedDate) + 
-                                                     '&time=' + encodeURIComponent(formattedTime);
-                            } catch (jsonError) {
-                                console.error('JSON parse error:', jsonError);
-                                // Redirect to confirmation page even if Google Sheets fails
-                                alert('Payment successful but there was an issue saving your details. Please contact support.');
-                                window.location.href = 'https://sagaremmanuel.github.io/JEE/confirm.html?' + 
-                                                     'payment_id=' + paymentId + 
-                                                     '&name=' + encodeURIComponent(name) + 
-                                                     '&date=' + encodeURIComponent(formattedDate) + 
-                                                     '&time=' + encodeURIComponent(formattedTime);
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            // Redirect to confirmation page even if Google Sheets fails
-                            alert('Payment successful but there was an issue saving your details. Please contact support with Payment ID: ' + paymentId);
-                            window.location.href = 'https://sagaremmanuel.github.io/JEE/confirm.html?' + 
-                                                 'payment_id=' + paymentId + 
-                                                 '&name=' + encodeURIComponent(name) + 
-                                                 '&date=' + encodeURIComponent(formattedDate) + 
-                                                 '&time=' + encodeURIComponent(formattedTime);
-                        });
+                },
+                prefill: {
+                    name: name,
+                    email: email,
+                    contact: phone
+                },
+                notes: {
+                    class: className,
+                    date: date,
+                    time: time,
+                    topic: topic
+                },
+                theme: {
+                    color: '#4361ee'
+                },
+                modal: {
+                    ondismiss: function() {
+                        // Hide loading indicator
+                        document.getElementById('loading-indicator').classList.remove('active');
+                        document.getElementById('pay-now-btn').disabled = false;
+                        alert('Payment cancelled. Please try again to book your session.');
                     }
-                    
-                    // Then your event listener
-                    document.getElementById('pay-now-btn').addEventListener('click', function() {
-                        // Validate form
-                        const form = document.getElementById('registration-form');
-                        if (!form.checkValidity()) {
-                            // Show which fields are missing
-                            const invalidFields = form.querySelectorAll(':invalid');
-                            invalidFields.forEach(field => {
-                                field.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                field.focus();
-                            });
-                            alert('Please fill all required fields');
-                            return;
-                        }
-                        
-                        // Show loading indicator
-                        document.getElementById('loading-indicator').classList.add('active');
-                        document.getElementById('pay-now-btn').disabled = true;
-                        
-                        // Get form data
-                        const name = document.getElementById('name').value;
-                        const email = document.getElementById('email').value;
-                        const phone = document.getElementById('phone').value;
-                        const className = document.getElementById('class').value;
-                        const date = document.getElementById('date').value;
-                        const time = document.getElementById('time').value;
-                        const topic = document.getElementById('topic').value || 'General JEE Preparation';
-                        
-                        // Format date for display
-                        const formattedDate = new Date(date).toLocaleDateString('en-IN', {
-                            weekday: 'long',
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                        });
-                        
-                        // Map time slot to display value
-                        const timeSlots = {
-                            'slot1': '4:00 PM - 4:45 PM',
-                            'slot2': '5:00 PM - 5:45 PM',
-                            'slot3': '6:00 PM - 6:45 PM',
-                            'slot4': '7:00 PM - 7:45 PM',
-                            'slot5': '8:00 PM - 8:45 PM'
-                        };
-                        const formattedTime = timeSlots[time] || time;
-                        
-                        // Create Razorpay options
-                        const options = {
-                            key: 'rzp_test_RKFaiKAvJ0poqh', // Your actual Razorpay key
-                            amount: 7000, // ₹70 in paise
-                            currency: 'INR',
-                            name: 'JEE Mentorship with Sagar & Sanjay',
-                            description: '45-minute mentorship session',
-                            image: 'https://via.placeholder.com/100x50?text=JEE+Logo',
-                            handler: function(response) {
-                                console.log('Payment successful!', response);
-                                // Hide loading indicator
-                                document.getElementById('loading-indicator').classList.remove('active');
-                                document.getElementById('pay-now-btn').disabled = false;
-                                
-                                // Save to Google Sheets
-                                saveToGoogleSheets(name, email, phone, className, date, time, topic, 70, response.razorpay_payment_id, formattedDate, formattedTime);
-                            },
-                            prefill: {
-                                name: name,
-                                email: email,
-                                contact: phone
-                            },
-                            notes: {
-                                class: className,
-                                date: date,
-                                time: time,
-                                topic: topic
-                            },
-                            theme: {
-                                color: '#4361ee'
-                            },
-                            modal: {
-                                ondismiss: function() {
-                                    // Hide loading indicator
-                                    document.getElementById('loading-indicator').classList.remove('active');
-                                    document.getElementById('pay-now-btn').disabled = false;
-                                    alert('Payment cancelled. Please try again to book your session.');
-                                }
-                            }
-                        };
-                        
-                        // Add error handling
-                        try {
-                            const rzp = new Razorpay(options);
-                            
-                            // Handle payment failures
-                            rzp.on('payment.failed', function(response) {
-                                console.log('Payment failed:', response.error);
-                                document.getElementById('loading-indicator').classList.remove('active');
-                                document.getElementById('pay-now-btn').disabled = false;
-                                alert('Payment failed: ' + response.error.description);
-                            });
-                            
-                            // Open the payment window
-                            rzp.open();
-                        } catch (error) {
-                            console.error('Error initializing Razorpay:', error);
-                            document.getElementById('loading-indicator').classList.remove('active');
-                            document.getElementById('pay-now-btn').disabled = false;
-                            alert('Error: ' + error.message);
-                        }
-                    });
+                }
+            };
             
             // Add error handling
             try {
@@ -918,76 +785,6 @@
                 alert('Error: ' + error.message);
             }
         });
-        
-        function saveToGoogleSheets(name, email, phone, className, topic, amount, paymentId, fixedDate, fixedTime) {
-            console.log('Saving to Google Sheets...');
-            
-            // Create form data for Google Apps Script
-            const formData = new FormData();
-            formData.append('name', name);
-            formData.append('email', email);
-            formData.append('phone', phone);
-            formData.append('class', className);
-            formData.append('date', fixedDate);
-            formData.append('time', fixedTime);
-            formData.append('topic', topic);
-            formData.append('amount', amount);
-            formData.append('paymentId', paymentId);
-            formData.append('status', 'Confirmed');
-            
-            // YOUR GOOGLE APPS SCRIPT URL
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbx90YUTiilH_TqjJmmCG_Fjoa66FbluEVLzcIM_o8YAKarJvOK-u6RJTEQx0Gh0RpuFTA/exec';
-            
-            fetch(scriptURL, {
-                method: 'POST',
-                mode: 'cors'
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.text();
-            })
-            .then(text => {
-                console.log('Raw response:', text);
-                
-                // Check if response contains HTML (sign-in page)
-                if (text.includes('<html') || text.includes('Sign in') || text.includes('登录') || text.includes('signin')) {
-                    throw new Error('Google Apps Script requires authentication. Please update deployment settings to "Anyone".');
-                }
-                
-                // Try to parse as JSON
-                try {
-                    const data = JSON.parse(text);
-                    console.log('Success:', data);
-                    // Redirect to confirmation page
-                    window.location.href = 'https://sagaremmanuel.github.io/JEE/confirm.html?' + 
-                                         'payment_id=' + paymentId + 
-                                         '&name=' + encodeURIComponent(name) + 
-                                         '&date=' + encodeURIComponent(fixedDate) + 
-                                         '&time=' + encodeURIComponent(fixedTime);
-                } catch (jsonError) {
-                    console.error('JSON parse error:', jsonError);
-                    // Redirect to confirmation page even if Google Sheets fails
-                    alert('Payment successful but there was an issue saving your details. Please contact support.');
-                    window.location.href = 'https://sagaremmanuel.github.io/JEE/confirm.html?' + 
-                                         'payment_id=' + paymentId + 
-                                         '&name=' + encodeURIComponent(name) + 
-                                         '&date=' + encodeURIComponent(fixedDate) + 
-                                         '&time=' + encodeURIComponent(fixedTime);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                // Redirect to confirmation page even if Google Sheets fails
-                alert('Payment successful but there was an issue saving your details. Please contact support with Payment ID: ' + paymentId);
-                window.location.href = 'https://sagaremmanuel.github.io/JEE/confirm.html?' + 
-                                     'payment_id=' + paymentId + 
-                                     '&name=' + encodeURIComponent(name) + 
-                                     '&date=' + encodeURIComponent(fixedDate) + 
-                                     '&time=' + encodeURIComponent(fixedTime);
-            });
-        }
     </script>
 </body>
 </html>
