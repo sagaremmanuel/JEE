@@ -584,207 +584,225 @@
     <!-- Razorpay Script -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
-        // Mobile menu toggle
-        document.addEventListener('DOMContentLoaded', function() {
-            const hamburger = document.getElementById('hamburger-menu');
-            const mobileMenu = document.getElementById('mobile-menu');
+    // Mobile menu toggle
+    document.addEventListener('DOMContentLoaded', function() {
+        const hamburger = document.getElementById('hamburger-menu');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        if (hamburger && mobileMenu) {
+            hamburger.addEventListener('click', function() {
+                mobileMenu.classList.toggle('active');
+                hamburger.classList.toggle('active');
+            });
             
-            if (hamburger && mobileMenu) {
-                hamburger.addEventListener('click', function() {
-                    mobileMenu.classList.toggle('active');
-                    // Animate hamburger to X
-                    hamburger.classList.toggle('active');
+            const mobileLinks = mobileMenu.querySelectorAll('.nav-links a');
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    mobileMenu.classList.remove('active');
+                    hamburger.classList.remove('active');
                 });
-                
-                // Close mobile menu when clicking on a link
-                const mobileLinks = mobileMenu.querySelectorAll('.nav-links a');
-                mobileLinks.forEach(link => {
-                    link.addEventListener('click', function() {
-                        mobileMenu.classList.remove('active');
-                        hamburger.classList.remove('active');
-                    });
-                });
-                
-                // Close mobile menu when clicking outside
-                document.addEventListener('click', function(event) {
-                    if (!mobileMenu.contains(event.target) && !hamburger.contains(event.target) && mobileMenu.classList.contains('active')) {
-                        mobileMenu.classList.remove('active');
-                        hamburger.classList.remove('active');
-                    }
-                });
-            }
+            });
+            
+            document.addEventListener('click', function(event) {
+                if (!mobileMenu.contains(event.target) && !hamburger.contains(event.target) && mobileMenu.classList.contains('active')) {
+                    mobileMenu.classList.remove('active');
+                    hamburger.classList.remove('active');
+                }
+            });
+        }
+    });
+    
+    // Define the saveToGoogleSheets function
+    function saveToGoogleSheets(name, email, phone, className, date, time, topic, amount, paymentId, formattedDate, formattedTime) {
+        console.log('Saving to Google Sheets...');
+        console.log('Data being sent:', {
+            name: name,
+            email: email,
+            phone: phone,
+            className: className,
+            date: date,
+            time: time,
+            topic: topic,
+            amount: amount,
+            paymentId: paymentId,
+            formattedDate: formattedDate,
+            formattedTime: formattedTime
         });
         
-        // Define the saveToGoogleSheets function
-        function saveToGoogleSheets(name, email, phone, className, date, time, topic, amount, paymentId, formattedDate, formattedTime) {
-            console.log('Saving to Google Sheets...');
+        // Create form data for Google Apps Script
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('email', email);
+        formData.append('phone', phone);
+        formData.append('class', className);
+        formData.append('date', date);
+        formData.append('time', time);
+        formData.append('topic', topic);
+        formData.append('amount', amount);
+        formData.append('paymentId', paymentId);
+        formData.append('status', 'Confirmed');
+        
+        // YOUR GOOGLE APPS SCRIPT URL
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbyo4GBDGjvIKz9yRnqLZvkiZEh3PQ6ekE0SKUyu-27KeuTHCmQAnwI2uHzFS6mUaJyBQQ/exec';
+        
+        fetch(scriptURL, {
+            method: 'POST',
+            mode: 'cors'
+        })
+        .then(response => {
+            console.log('Response status:', response.status);
+            console.log('Response headers:', [...response.headers.entries()]);
+            return response.text();
+        })
+        .then(text => {
+            console.log('Raw response:', text);
             
-            // Create form data for Google Apps Script
-            const formData = new FormData();
-            formData.append('name', name);
-            formData.append('email', email);
-            formData.append('phone', phone);
-            formData.append('class', className);
-            formData.append('date', date);
-            formData.append('time', time);
-            formData.append('topic', topic);
-            formData.append('amount', amount);
-            formData.append('paymentId', paymentId);
-            formData.append('status', 'Confirmed');
-            
-            // YOUR GOOGLE APPS SCRIPT URL
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbx90YUTiilH_TqjJmmCG_Fjoa66FbluEVLzcIM_o8YAKarJvOK-u6RJTEQx0Gh0RpuFTA/exec';
-            
-            fetch(scriptURL, {
-                method: 'POST',
-                mode: 'cors'
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.text();
-            })
-            .then(text => {
-                console.log('Raw response:', text);
-                
-                // Check if response contains HTML (sign-in page)
-                if (text.includes('<html') || text.includes('Sign in') || text.includes('登录') || text.includes('signin')) {
-                    console.error('Google Apps Script requires authentication. Redirecting to confirmation page.');
-                    // Redirect to confirmation page even if Google Sheets fails
-                    window.location.href = 'https://sagaremmanuel.github.io/JEE/confirm.html?' + 
-                        'payment_id=' + paymentId + 
-                        '&name=' + encodeURIComponent(name) + 
-                        '&date=' + encodeURIComponent(formattedDate) + 
-                        '&time=' + encodeURIComponent(formattedTime);
-                    return;
-                }
-                
-                // Try to parse as JSON
-                try {
-                    const data = JSON.parse(text);
-                    console.log('Success:', data);
-                    // Redirect to confirmation page
-                    window.location.href = 'https://sagaremmanuel.github.io/JEE/confirm.html?' + 
-                        'payment_id=' + paymentId + 
-                        '&name=' + encodeURIComponent(name) + 
-                        '&date=' + encodeURIComponent(formattedDate) + 
-                        '&time=' + encodeURIComponent(formattedTime);
-                } catch (jsonError) {
-                    console.error('JSON parse error:', jsonError);
-                    // Redirect to confirmation page even if Google Sheets fails
-                    window.location.href = 'https://sagaremmanuel.github.io/JEE/confirm.html?' + 
-                        'payment_id=' + paymentId + 
-                        '&name=' + encodeURIComponent(name) + 
-                        '&date=' + encodeURIComponent(formattedDate) + 
-                        '&time=' + encodeURIComponent(formattedTime);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
+            // Check if response contains HTML (sign-in page)
+            if (text.includes('<html') || text.includes('Sign in') || text.includes('登录') || text.includes('signin') || text.includes('Sign in')) {
+                console.error('Google Apps Script requires authentication. Redirecting to confirmation page.');
                 // Redirect to confirmation page even if Google Sheets fails
                 window.location.href = 'https://sagaremmanuel.github.io/JEE/confirm.html?' + 
                     'payment_id=' + paymentId + 
                     '&name=' + encodeURIComponent(name) + 
                     '&date=' + encodeURIComponent(formattedDate) + 
                     '&time=' + encodeURIComponent(formattedTime);
-            });
-        }
-        
-        // Payment button event listener
-        document.getElementById('pay-now-btn').addEventListener('click', function() {
-            // Validate form
-            const form = document.getElementById('registration-form');
-            if (!form.checkValidity()) {
-                // Show which fields are missing
-                const invalidFields = form.querySelectorAll(':invalid');
-                invalidFields.forEach(field => {
-                    field.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    field.focus();
-                });
-                alert('Please fill all required fields');
                 return;
             }
             
-            // Show loading indicator
-            document.getElementById('loading-indicator').classList.add('active');
-            document.getElementById('pay-now-btn').disabled = true;
-            
-            // Get form data
-            const name = document.getElementById('name').value;
-            const email = document.getElementById('email').value;
-            const phone = document.getElementById('phone').value;
-            const className = document.getElementById('class').value;
-            const date = '28th September 2025'; // Fixed date
-            const time = '9:00 PM IST'; // Fixed time
-            const topic = document.getElementById('topic').value || 'General JEE Preparation';
-            
-            // Format date for display
-            const formattedDate = '28th September 2025';
-            const formattedTime = '9:00 PM IST';
-            
-            // Create Razorpay options
-            const options = {
-                key: 'rzp_test_RKFaiKAvJ0poqh', // Your actual Razorpay key
-                amount: 7000, // ₹70 in paise
-                currency: 'INR',
-                name: 'JEE Mentorship with Sagar & Sanjay',
-                description: '1-hour mentorship session',
-                image: 'https://via.placeholder.com/100x50?text=JEE+Logo',
-                handler: function(response) {
-                    console.log('Payment successful!', response);
-                    // Hide loading indicator
-                    document.getElementById('loading-indicator').classList.remove('active');
-                    document.getElementById('pay-now-btn').disabled = false;
-                    
-                    // Save to Google Sheets
-                    saveToGoogleSheets(name, email, phone, className, date, time, topic, 70, response.razorpay_payment_id, formattedDate, formattedTime);
-                },
-                prefill: {
-                    name: name,
-                    email: email,
-                    contact: phone
-                },
-                notes: {
-                    class: className,
-                    date: date,
-                    time: time,
-                    topic: topic
-                },
-                theme: {
-                    color: '#4361ee'
-                },
-                modal: {
-                    ondismiss: function() {
-                        // Hide loading indicator
-                        document.getElementById('loading-indicator').classList.remove('active');
-                        document.getElementById('pay-now-btn').disabled = false;
-                        alert('Payment cancelled. Please try again to book your session.');
-                    }
-                }
-            };
-            
-            // Add error handling
+            // Try to parse as JSON
             try {
-                const rzp = new Razorpay(options);
-                
-                // Handle payment failures
-                rzp.on('payment.failed', function(response) {
-                    console.log('Payment failed:', response.error);
-                    document.getElementById('loading-indicator').classList.remove('active');
-                    document.getElementById('pay-now-btn').disabled = false;
-                    alert('Payment failed: ' + response.error.description);
-                });
-                
-                // Open the payment window
-                rzp.open();
-            } catch (error) {
-                console.error('Error initializing Razorpay:', error);
+                const data = JSON.parse(text);
+                console.log('Success:', data);
+                // Redirect to confirmation page
+                window.location.href = 'https://sagaremmanuel.github.io/JEE/confirm.html?' + 
+                    'payment_id=' + paymentId + 
+                    '&name=' + encodeURIComponent(name) + 
+                    '&date=' + encodeURIComponent(formattedDate) + 
+                    '&time=' + encodeURIComponent(formattedTime);
+            } catch (jsonError) {
+                console.error('JSON parse error:', jsonError);
+                // Redirect to confirmation page even if Google Sheets fails
+                window.location.href = 'https://sagaremmanuel.github.io/JEE/confirm.html?' + 
+                    'payment_id=' + paymentId + 
+                    '&name=' + encodeURIComponent(name) + 
+                    '&date=' + encodeURIComponent(formattedDate) + 
+                    '&time=' + encodeURIComponent(formattedTime);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Redirect to confirmation page even if Google Sheets fails
+            window.location.href = 'https://sagaremmanuel.github.io/JEE/confirm.html?' + 
+                'payment_id=' + paymentId + 
+                '&name=' + encodeURIComponent(name) + 
+                '&date=' + encodeURIComponent(formattedDate) + 
+                '&time=' + encodeURIComponent(formattedTime);
+        });
+    }
+    
+    // Payment button event listener
+    document.getElementById('pay-now-btn').addEventListener('click', function() {
+        // Validate form
+        const form = document.getElementById('registration-form');
+        if (!form.checkValidity()) {
+            const invalidFields = form.querySelectorAll(':invalid');
+            invalidFields.forEach(field => {
+                field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                field.focus();
+            });
+            alert('Please fill all required fields');
+            return;
+        }
+        
+        // Show loading indicator
+        document.getElementById('loading-indicator').classList.add('active');
+        document.getElementById('pay-now-btn').disabled = true;
+        
+        // Get form data
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const phone = document.getElementById('phone').value;
+        const className = document.getElementById('class').value;
+        const date = '28th September 2025'; // Fixed date
+        const time = '9:00 PM IST'; // Fixed time
+        const topic = document.getElementById('topic').value || 'General JEE Preparation';
+        
+        // Format date for display
+        const formattedDate = '28th September 2025';
+        const formattedTime = '9:00 PM IST';
+        
+        // Log the form data
+        console.log('Form data collected:', {
+            name: name,
+            email: email,
+            phone: phone,
+            className: className,
+            date: date,
+            time: time,
+            topic: topic
+        });
+        
+        // Create Razorpay options
+        const options = {
+            key: 'rzp_test_RKFaiKAvJ0poqh',
+            amount: 7000,
+            currency: 'INR',
+            name: 'JEE Mentorship with Sagar & Sanjay',
+            description: '1-hour mentorship session',
+            image: 'https://via.placeholder.com/100x50?text=JEE+Logo',
+            handler: function(response) {
+                console.log('Payment successful!', response);
                 document.getElementById('loading-indicator').classList.remove('active');
                 document.getElementById('pay-now-btn').disabled = false;
-                alert('Error: ' + error.message);
+                
+                // Log payment response
+                console.log('Payment response:', response);
+                
+                // Save to Google Sheets
+                saveToGoogleSheets(name, email, phone, className, date, time, topic, 70, response.razorpay_payment_id, formattedDate, formattedTime);
+            },
+            prefill: {
+                name: name,
+                email: email,
+                contact: phone
+            },
+            notes: {
+                class: className,
+                date: date,
+                time: time,
+                topic: topic
+            },
+            theme: {
+                color: '#4361ee'
+            },
+            modal: {
+                ondismiss: function() {
+                    document.getElementById('loading-indicator').classList.remove('active');
+                    document.getElementById('pay-now-btn').disabled = false;
+                    alert('Payment cancelled. Please try again to book your session.');
+                }
             }
-        });
-    </script>
+        };
+        
+        // Add error handling
+        try {
+            const rzp = new Razorpay(options);
+            
+            rzp.on('payment.failed', function(response) {
+                console.log('Payment failed:', response.error);
+                document.getElementById('loading-indicator').classList.remove('active');
+                document.getElementById('pay-now-btn').disabled = false;
+                alert('Payment failed: ' + response.error.description);
+            });
+            
+            rzp.open();
+        } catch (error) {
+            console.error('Error initializing Razorpay:', error);
+            document.getElementById('loading-indicator').classList.remove('active');
+            document.getElementById('pay-now-btn').disabled = false;
+            alert('Error: ' + error.message);
+        }
+    });
+</script>
 </body>
 </html>
