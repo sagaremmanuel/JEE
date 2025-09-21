@@ -79,20 +79,22 @@
             display: none;
             flex-direction: column;
             cursor: pointer;
+            width: 30px;
+            height: 21px;
+            justify-content: space-between;
         }
         
         .hamburger div {
-            width: 25px;
+            width: 30px;
             height: 3px;
             background-color: var(--dark);
-            margin: 3px;
             transition: all 0.3s ease;
         }
         
         .mobile-menu {
             position: fixed;
             top: 70px;
-            right: -100%;
+            right: -300px;
             width: 80%;
             max-width: 300px;
             height: calc(100vh - 70px);
@@ -242,7 +244,7 @@
             }
             
             /* Hide desktop nav, show hamburger */
-            .nav-links {
+            .nav-links:not(.mobile-menu .nav-links) {
                 display: none;
             }
             
@@ -444,7 +446,7 @@
                 </ul>
                 
                 <!-- Hamburger Menu for Mobile -->
-                <div class="hamburger">
+                <div class="hamburger" id="hamburger-menu">
                     <div class="line1"></div>
                     <div class="line2"></div>
                     <div class="line3"></div>
@@ -453,7 +455,7 @@
         </div>
         
         <!-- Mobile Menu -->
-        <div class="mobile-menu">
+        <div class="mobile-menu" id="mobile-menu">
             <ul class="nav-links">
                 <li><a href="terms.html">Terms</a></li>
                 <li><a href="privacy.html">Privacy</a></li>
@@ -568,23 +570,35 @@
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
         // Mobile menu toggle
-        const hamburger = document.querySelector('.hamburger');
-        const mobileMenu = document.querySelector('.mobile-menu');
-        
-        hamburger.addEventListener('click', function() {
-            mobileMenu.classList.toggle('active');
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburger = document.getElementById('hamburger-menu');
+            const mobileMenu = document.getElementById('mobile-menu');
             
-            // Animate hamburger to X
-            hamburger.classList.toggle('active');
-        });
-        
-        // Close mobile menu when clicking on a link
-        const mobileLinks = document.querySelectorAll('.mobile-menu .nav-links a');
-        mobileLinks.forEach(link => {
-            link.addEventListener('click', function() {
-                mobileMenu.classList.remove('active');
-                hamburger.classList.remove('active');
-            });
+            if (hamburger && mobileMenu) {
+                hamburger.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('active');
+                    
+                    // Animate hamburger to X
+                    hamburger.classList.toggle('active');
+                });
+                
+                // Close mobile menu when clicking on a link
+                const mobileLinks = mobileMenu.querySelectorAll('.nav-links a');
+                mobileLinks.forEach(link => {
+                    link.addEventListener('click', function() {
+                        mobileMenu.classList.remove('active');
+                        hamburger.classList.remove('active');
+                    });
+                });
+                
+                // Close mobile menu when clicking outside
+                document.addEventListener('click', function(event) {
+                    if (!mobileMenu.contains(event.target) && !hamburger.contains(event.target) && mobileMenu.classList.contains('active')) {
+                        mobileMenu.classList.remove('active');
+                        hamburger.classList.remove('active');
+                    }
+                });
+            }
         });
         
         document.getElementById('pay-now-btn').addEventListener('click', function() {
