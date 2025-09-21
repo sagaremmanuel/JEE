@@ -668,36 +668,123 @@
                 name: 'JEE Mentorship with Sagar & Sanjay',
                 description: '1-hour mentorship session',
                 image: 'https://via.placeholder.com/100x50?text=JEE+Logo',
+                // In your register.html, replace the handler function and saveToGoogleSheets function
+
                 handler: function(response) {
                     console.log('Payment successful!', response);
                     // Hide loading indicator
                     document.getElementById('loading-indicator').classList.remove('active');
                     document.getElementById('pay-now-btn').disabled = false;
                     
-                    // Save to Google Sheets
-                        saveToGoogleSheets(name, email, phone, className, topic, 70, response.razorpay_payment_id, fixedDate, fixedTime);
-                },
-                prefill: {
-                    name: name,
-                    email: email,
-                    contact: phone
-                },
-                notes: {
-                    class: className,
-                    topic: topic
-                },
-                theme: {
-                    color: '#4361ee'
-                },
-                modal: {
-                    ondismiss: function() {
-                        // Hide loading indicator
-                        document.getElementById('loading-indicator').classList.remove('active');
-                        document.getElementById('pay-now-btn').disabled = false;
-                        alert('Payment cancelled. Please try again to book your session.');
-                    }
+                    // Get form data for Google Sheets
+                    const name = document.getElementById('name').value;
+                    const email = document.getElementById('email').value;
+                    const phone = document.getElementById('phone').value;
+                    const className = document.getElementById('class').value;
+                    const date = document.getElementById('date').value;
+                    const time = document.getElementById('time').value;
+                    const topic = document.getElementById('topic').value || 'General JEE Preparation';
+                    const formattedDate = new Date(date).toLocaleDateString('en-IN', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                    const timeSlots = {
+                        'slot1': '4:00 PM - 4:45 PM',
+                        'slot2': '5:00 PM - 5:45 PM',
+                        'slot3': '6:00 PM - 6:45 PM',
+                        'slot4': '7:00 PM - 7:45 PM',
+                        'slot5': '8:00 PM - 8:45 PM'
+                    };
+                    const formattedTime = timeSlots[time] || time;
+                    
+                    // Log the data before sending
+                    console.log('Data to send to Google Sheets:', {
+                        name, email, phone, className, date, time, topic, 
+                        amount: 70, paymentId: response.razorpay_payment_id, 
+                        formattedDate, formattedTime
+                    });
+                    
+                    // Try to save to Google Sheets
+                    saveToGoogleSheets(name, email, phone, className, date, time, topic, 70, response.razorpay_payment_id, formattedDate, formattedTime);
                 }
-            };
+                
+                function saveToGoogleSheets(name, email, phone, className, date, time, topic, amount, paymentId, formattedDate, formattedTime) {
+                    console.log('Saving to Google Sheets...');
+                    
+                    // Create form data for Google Apps Script
+                    const formData = new FormData();
+                    formData.append('name', name);
+                    formData.append('email', email);
+                    formData.append('phone', phone);
+                    formData.append('class', className);
+                    formData.append('date', date);
+                    formData.append('time', time);
+                    formData.append('topic', topic);
+                    formData.append('amount', amount);
+                    formData.append('paymentId', paymentId);
+                    formData.append('status', 'Confirmed');
+                    
+                    // YOUR GOOGLE APPS SCRIPT URL
+                    const scriptURL = 'https://script.google.com/macros/s/AKfycbyo4GBDGjvIKz9yRnqLZvkiZEh3PQ6ekE0SKUyu-27KeuTHCmQAnwI2uHzFS6mUaJyBQQ/exec';
+                    
+                    fetch(scriptURL, {
+                        method: 'POST',
+                        mode: 'cors'
+                    })
+                    .then(response => {
+                        console.log('Response status:', response.status);
+                        return response.text();
+                    })
+                    .then(text => {
+                        console.log('Raw response:', text);
+                        
+                        try {
+                            const data = JSON.parse(text);
+                            console.log('Parsed response:', data);
+                            
+                            if (data.result === "success") {
+                                console.log('Data saved successfully to Google Sheets');
+                                // Redirect to confirmation page
+                                window.location.href = 'https://sagaremmanuel.github.io/JEE/confirm.html?' + 
+                                                     'payment_id=' + paymentId + 
+                                                     '&name=' + encodeURIComponent(name) + 
+                                                     '&date=' + encodeURIComponent(formattedDate) + 
+                                                     '&time=' + encodeURIComponent(formattedTime);
+                            } else {
+                                console.error('Error saving to Google Sheets:', data.message);
+                                // Redirect to confirmation page even if Google Sheets fails
+                                alert('Payment successful but there was an issue saving your details. Please contact support.');
+                                window.location.href = 'https://sagaremmanuel.github.io/JEE/confirm.html?' + 
+                                                     'payment_id=' + paymentId + 
+                                                     '&name=' + encodeURIComponent(name) + 
+                                                     '&date=' + encodeURIComponent(formattedDate) + 
+                                                     '&time=' + encodeURIComponent(formattedTime);
+                            }
+                        } catch (jsonError) {
+                            console.error('JSON parse error:', jsonError);
+                            console.log('Raw text that failed to parse:', text);
+                            // Redirect to confirmation page even if Google Sheets fails
+                            alert('Payment successful but there was an issue saving your details. Please contact support.');
+                            window.location.href = 'https://sagaremmanuel.github.io/JEE/confirm.html?' + 
+                                                 'payment_id=' + paymentId + 
+                                                 '&name=' + encodeURIComponent(name) + 
+                                                 '&date=' + encodeURIComponent(formattedDate) + 
+                                                 '&time=' + encodeURIComponent(formattedTime);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        // Redirect to confirmation page even if Google Sheets fails
+                        alert('Payment successful but there was an issue saving your details. Please contact support with Payment ID: ' + paymentId);
+                        window.location.href = 'https://sagaremmanuel.github.io/JEE/confirm.html?' + 
+                                             'payment_id=' + paymentId + 
+                                             '&name=' + encodeURIComponent(name) + 
+                                             '&date=' + encodeURIComponent(formattedDate) + 
+                                             '&time=' + encodeURIComponent(formattedTime);
+                    });
+                }
             
             // Add error handling
             try {
