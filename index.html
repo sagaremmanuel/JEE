@@ -1,100 +1,72 @@
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-<script>
-    // Set minimum date to today
-    document.addEventListener('DOMContentLoaded', function() {
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('date').setAttribute('min', today);
-    });
-    
-    document.getElementById('pay-now-btn').addEventListener('click', function() {
-        // Validate form
-        const form = document.getElementById('registration-form');
-        if (!form.checkValidity()) {
-            const invalidFields = form.querySelectorAll(':invalid');
-            invalidFields.forEach(field => {
-                field.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                field.focus();
-            });
-            alert('Please fill all required fields');
-            return;
-        }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Payment Page</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .btn { padding: 10px 20px; background: #4361ee; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Test Payment Page</h1>
+        <p>If you can see this text, your HTML file is loading correctly.</p>
         
-        // Show loading indicator
-        document.getElementById('loading-indicator').classList.add('active');
-        document.getElementById('pay-now-btn').disabled = true;
+        <form id="test-form">
+            <div>
+                <label>Name:</label>
+                <input type="text" id="name" required>
+            </div>
+            <button type="button" id="test-btn" class="btn">Test Payment</button>
+        </form>
         
-        // Get form data
-        const name = document.getElementById('name').value;
-        const email = document.getElementById('email').value;
-        const phone = document.getElementById('phone').value;
-        const className = document.getElementById('class').options[document.getElementById('class').selectedIndex].text;
-        const date = document.getElementById('date').value;
-        const time = document.getElementById('time').options[document.getElementById('time').selectedIndex].text;
-        const topic = document.getElementById('topic').value || 'General JEE Preparation';
-        
-        // Format date for display
-        const formattedDate = new Date(date).toLocaleDateString('en-IN', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-        
-        // Create Razorpay options
-        const options = {
-            key: 'rzp_test_1234567890', // Test key
-            amount: 7000, // ₹70 in paise
-            currency: 'INR',
-            name: 'JEE Mentorship with Sagar & Sanjay',
-            description: '45-minute mentorship session',
-            image: 'https://via.placeholder.com/100x50?text=JEE+Logo',
-            handler: function(response) {
-                console.log('Payment successful!', response);
-                // Hide loading indicator
-                document.getElementById('loading-indicator').classList.remove('active');
-                document.getElementById('pay-now-btn').disabled = false;
-                
-                // Redirect to confirmation page (skip Google Sheets for now)
-                window.location.href = 'confirmation.html?' + 
-                    'payment_id=' + response.razorpay_payment_id + 
-                    '&name=' + encodeURIComponent(name) + 
-                    '&date=' + encodeURIComponent(formattedDate) + 
-                    '&time=' + encodeURIComponent(time);
-            },
-            prefill: {
-                name: name,
-                email: email,
-                contact: phone
-            },
-            theme: {
-                color: '#4361ee'
-            },
-            modal: {
-                ondismiss: function() {
-                    // Hide loading indicator
-                    document.getElementById('loading-indicator').classList.remove('active');
-                    document.getElementById('pay-now-btn').disabled = false;
-                    alert('Payment cancelled. Please try again to book your session.');
-                }
-            }
-        };
-        
-        // Open Razorpay checkout
-        try {
-            const rzp = new Razorpay(options);
-            rzp.on('payment.failed', function(response) {
-                console.log('Payment failed!', response);
-                document.getElementById('loading-indicator').classList.remove('active');
-                document.getElementById('pay-now-btn').disabled = false;
-                alert('Payment failed. Please try again. Error: ' + response.error.description);
-            });
+        <div id="loading" style="display: none; margin: 20px 0;">
+            Processing... Please wait
+        </div>
+    </div>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        document.getElementById('test-btn').addEventListener('click', function() {
+            // Simple test - just show alert
+            alert('Button works! Now trying payment...');
             
-            rzp.open();
-        } catch (error) {
-            console.error('Razorpay error:', error);
-            document.getElementById('loading-indicator').classList.remove('active');
-            document.getElementById('pay-now-btn').disabled = false;
-            alert('There was an error initializing the payment. Please try again.');
-        }
-    });
-</script>
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            
+            // Test Razorpay
+            try {
+                const options = {
+                    key: 'rzp_test_1234567890',
+                    amount: 7000,
+                    currency: 'INR',
+                    name: 'Test Payment',
+                    description: 'Test transaction',
+                    handler: function(response) {
+                        document.getElementById('loading').style.display = 'none';
+                        alert('Payment successful! ID: ' + response.razorpay_payment_id);
+                    },
+                    prefill: {
+                        name: document.getElementById('name').value || 'Test User',
+                        email: 'test@example.com',
+                        contact: '9999999999'
+                    },
+                    theme: {
+                        color: '#4361ee'
+                    }
+                };
+                
+                const rzp = new Razorpay(options);
+                rzp.open();
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                alert('Error: ' + error.message);
+                console.error('Razorpay error:', error);
+            }
+        });
+    </script>
+</body>
+</html>
