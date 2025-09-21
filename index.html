@@ -3,211 +3,456 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JEE Mentorship Session Registration</title>
+    <title>Mentorship Session with Sagar & Sanjay</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap');
+        
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #4cc9f0;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4ade80;
+            --gradient: linear-gradient(135deg, #4361ee, #3a0ca3);
+        }
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
         }
         
         body {
-            background-color: #f5f5f5;
-            color: #333;
+            font-family: 'Poppins', sans-serif;
+            background: #f0f2f5;
+            color: var(--dark);
             line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: radial-gradient(circle at top right, rgba(67, 97, 238, 0.05), transparent 30%), 
+                              radial-gradient(circle at bottom left, rgba(58, 12, 163, 0.05), transparent 30%);
         }
         
         .container {
             max-width: 800px;
-            margin: 40px auto;
-            padding: 30px;
+            width: 100%;
             background: white;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            position: relative;
         }
         
-        h1 {
+        .header {
+            background: var(--gradient);
+            color: white;
+            padding: 40px 40px 30px;
             text-align: center;
-            color: #2c3e50;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+        }
+        
+        .header h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            position: relative;
+            letter-spacing: -0.5px;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .mentors {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 25px;
+            position: relative;
+        }
+        
+        .mentor {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 10px 20px;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            font-weight: 500;
+        }
+        
+        .price-tag {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .form-container {
+            padding: 40px;
+        }
+        
+        .form-step {
             margin-bottom: 30px;
-            font-size: 28px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .form-step:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .form-step h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            color: var(--secondary);
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-step h2 i {
+            color: var(--primary);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
         }
         
         .form-group {
             margin-bottom: 20px;
         }
         
-        label {
+        .form-group label {
             display: block;
             margin-bottom: 8px;
             font-weight: 500;
-            color: #2c3e50;
+            color: var(--dark);
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
         
-        input, select {
+        .form-group label i {
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+        
+        .form-control {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
+            padding: 14px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
         }
         
-        .price-summary {
-            background-color: #f8f9fa;
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+        
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%234361ee' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            padding-right: 40px;
+        }
+        
+        .info-box {
+            background: #f0f7ff;
+            border: 1px solid #d0e4ff;
+            border-radius: 12px;
             padding: 20px;
-            border-radius: 8px;
             margin: 25px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        
+        .info-box i {
+            color: var(--primary);
+            font-size: 1.5rem;
+            margin-top: 3px;
+        }
+        
+        .payment-summary {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+            border: 1px solid #e9ecef;
+        }
+        
+        .payment-summary h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            color: var(--secondary);
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.3rem;
         }
         
         .price-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
+            padding: 12px 0;
+            font-size: 1.1rem;
         }
         
-        .total {
-            font-weight: bold;
-            font-size: 18px;
-            border-top: 1px solid #ddd;
-            padding-top: 10px;
-            margin-top: 10px;
+        .price-row.border-bottom {
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .price-row.total {
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: var(--secondary);
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #e9ecef;
+        }
+        
+        .price-row.total span:last-child {
+            color: var(--primary);
+            font-size: 1.5rem;
         }
         
         .btn {
-            display: block;
             width: 100%;
-            padding: 15px;
-            background-color: #3498db;
+            padding: 16px;
+            background: var(--gradient);
             color: white;
             border: none;
-            border-radius: 5px;
-            font-size: 18px;
-            font-weight: 500;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', sans-serif;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
         }
         
         .btn:hover {
-            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
         }
         
-        .mentor-info {
-            background-color: #e8f4fd;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 25px;
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .footer-note {
+            text-align: center;
+            margin-top: 25px;
+            color: #6c757d;
+            font-size: 0.9rem;
         }
         
         @media (max-width: 768px) {
             .container {
-                margin: 20px;
-                padding: 20px;
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 30px 25px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .mentors {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            
+            .form-container {
+                padding: 30px 25px;
             }
         }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <h1>Book Your JEE Mentorship Session</h1>
-        
-        <div class="mentor-info">
-            <h3>Session Details</h3>
-            <p>60-minute 1-on-1 session with IITian mentor</p>
-            <p>Focus: JEE Main & Advanced Preparation</p>
+        <div class="header">
+            <div class="price-tag">₹70 Only</div>
+            <h1>Book Your Mentorship Session</h1>
+            <p>Personalized guidance to help you excel in your JEE preparation</p>
+            <div class="mentors">
+                <div class="mentor">
+                    <i class="fas fa-user-tie"></i> <span>Sagar</span>
+                </div>
+                <div class="mentor">
+                    <i class="fas fa-user-tie"></i> <span>Sanjay</span>
+                </div>
+            </div>
         </div>
         
-        <form id="registration-form">
-            <div class="form-group">
-                <label for="name">Full Name *</label>
-                <input type="text" id="name" name="name" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="email">Email Address *</label>
-                <input type="email" id="email" name="email" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="phone">Phone Number *</label>
-                <input type="tel" id="phone" name="phone" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="class">Current Class *</label>
-                <select id="class" name="class" required>
-                    <option value="">Select your class</option>
-                    <option value="11">Class 11</option>
-                    <option value="12">Class 12</option>
-                    <option value="dropper">Dropper</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="subject">Subject to Focus On *</label>
-                <select id="subject" name="subject" required onchange="updatePrice()">
-                    <option value="">Select subject</option>
-                    <option value="physics" data-price="499">Physics - ₹499</option>
-                    <option value="chemistry" data-price="499">Chemistry - ₹499</option>
-                    <option value="mathematics" data-price="499">Mathematics - ₹499</option>
-                    <option value="full-syllabus" data-price="799">Full Syllabus Strategy - ₹799</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="date">Preferred Date *</label>
-                <input type="date" id="date" name="date" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="time">Preferred Time Slot *</label>
-                <select id="time" name="time" required>
-                    <option value="">Select time</option>
-                    <option value="morning">8:00 AM - 10:00 AM</option>
-                    <option value="late-morning">10:30 AM - 12:30 PM</option>
-                    <option value="afternoon">2:00 PM - 4:00 PM</option>
-                    <option value="evening">5:00 PM - 7:00 PM</option>
-                    <option value="night">7:30 PM - 9:30 PM</option>
-                </select>
-            </div>
-            
-            <div class="price-summary">
-                <h3>Payment Summary</h3>
-                <div class="price-row">
-                    <span>Session Fee:</span>
-                    <span id="fee-display">₹0</span>
+        <div class="form-container">
+            <form id="registration-form">
+                <div class="form-step">
+                    <h2><i class="fas fa-user"></i> Your Details</h2>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="name"><i class="fas fa-user"></i> Full Name *</label>
+                            <input type="text" id="name" class="form-control" placeholder="Enter your full name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email"><i class="fas fa-envelope"></i> Email Address *</label>
+                            <input type="email" id="email" class="form-control" placeholder="Enter your email" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phone"><i class="fas fa-phone"></i> Phone Number *</label>
+                            <input type="tel" id="phone" class="form-control" placeholder="Enter your phone number" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="class"><i class="fas fa-graduation-cap"></i> Current Class *</label>
+                            <select id="class" class="form-control" required>
+                                <option value="">Select your class</option>
+                                <option value="11">Class 11</option>
+                                <option value="12">Class 12</option>
+                                <option value="dropper">Dropper</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
-                <div class="price-row">
-                    <span>Platform Fee:</span>
-                    <span>₹0</span>
+                
+                <div class="form-step">
+                    <h2><i class="fas fa-calendar-alt"></i> Session Details</h2>
+                    <div class="info-box">
+                        <i class="fas fa-lightbulb"></i>
+                        <div>
+                            <strong>Important Note:</strong> All sessions are 45 minutes long and conducted online. 
+                            You'll receive a confirmation email with the meeting link after successful payment.
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="date"><i class="fas fa-calendar"></i> Preferred Date *</label>
+                            <input type="date" id="date" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="time"><i class="fas fa-clock"></i> Preferred Time Slot *</label>
+                            <select id="time" class="form-control" required>
+                                <option value="">Select time slot</option>
+                                <option value="slot1">4:00 PM - 4:45 PM</option>
+                                <option value="slot2">5:00 PM - 5:45 PM</option>
+                                <option value="slot3">6:00 PM - 6:45 PM</option>
+                                <option value="slot4">7:00 PM - 7:45 PM</option>
+                                <option value="slot5">8:00 PM - 8:45 PM</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="topic"><i class="fas fa-book"></i> Specific Topic or Question (Optional)</label>
+                        <input type="text" id="topic" class="form-control" placeholder="What would you like to discuss?">
+                    </div>
                 </div>
-                <div class="price-row total">
-                    <span>Total Amount:</span>
-                    <span id="total-display">₹0</span>
+                
+                <div class="payment-summary">
+                    <h3>Payment Summary</h3>
+                    <div class="price-row border-bottom">
+                        <span>Mentorship Session (45 mins)</span>
+                        <span>₹70</span>
+                    </div>
+                    <div class="price-row">
+                        <span>Platform Fee</span>
+                        <span>₹0</span>
+                    </div>
+                    <div class="price-row total">
+                        <span>Total Payable Amount</span>
+                        <span>₹70</span>
+                    </div>
                 </div>
-            </div>
-            
-            <button type="button" id="pay-now-btn" class="btn">Pay Now & Book Session</button>
-        </form>
+                
+                <button type="button" id="pay-now-btn" class="btn">
+                    <i class="fas fa-lock"></i> Pay ₹70 & Book Session
+                </button>
+                
+                <div class="footer-note">
+                    <p>Secure Payment via Razorpay • 100% Money Back Guarantee if session not conducted</p>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- Razorpay Script -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
-        function updatePrice() {
-            const subjectSelect = document.getElementById('subject');
-            const selectedOption = subjectSelect.options[subjectSelect.selectedIndex];
-            const price = selectedOption.getAttribute('data-price') || 0;
-            
-            document.getElementById('fee-display').textContent = '₹' + price;
-            document.getElementById('total-display').textContent = '₹' + price;
-        }
+        // Set minimum date to today
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('date').setAttribute('min', today);
+        });
         
         document.getElementById('pay-now-btn').addEventListener('click', function() {
             // Validate form
             const form = document.getElementById('registration-form');
             if (!form.checkValidity()) {
+                // Show which fields are missing
+                const invalidFields = form.querySelectorAll(':invalid');
+                invalidFields.forEach(field => {
+                    field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    field.focus();
+                });
                 alert('Please fill all required fields');
                 return;
             }
@@ -216,23 +461,32 @@
             const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
             const phone = document.getElementById('phone').value;
-            const subject = document.getElementById('subject').options[document.getElementById('subject').selectedIndex].text;
-            const amount = document.getElementById('total-display').textContent.replace('₹', '') * 100; // Razorpay expects paise
+            const className = document.getElementById('class').options[document.getElementById('class').selectedIndex].text;
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').options[document.getElementById('time').selectedIndex].text;
+            
+            // Format date for display
+            const formattedDate = new Date(date).toLocaleDateString('en-IN', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
             
             // Create Razorpay options
             const options = {
                 key: 'rzp_test_1234567890', // Replace with your Razorpay key
-                amount: amount,
+                amount: 7000, // ₹70 in paise
                 currency: 'INR',
-                name: 'JEE MentorConnect',
-                description: 'Mentorship Session Booking',
-                image: 'https://via.placeholder.com/100x50?text=JEE+Logo',
+                name: 'JEE Mentorship',
+                description: 'Session with Sagar & Sanjay',
+                image: 'https://via.placeholder.com/100x50?text=Logo',
                 handler: function(response) {
-                    // Payment successful
-                    alert('Payment successful! Your session has been booked.');
-                    // Here you would typically send the payment details to your server
-                    // and redirect to a confirmation page
-                    window.location.href = 'confirmation.html?payment_id=' + response.razorpay_payment_id;
+                    // Redirect to confirmation page
+                    window.location.href = 'confirmation.html?payment_id=' + response.razorpay_payment_id + 
+                                         '&name=' + encodeURIComponent(name) + 
+                                         '&date=' + encodeURIComponent(formattedDate) + 
+                                         '&time=' + encodeURIComponent(time);
                 },
                 prefill: {
                     name: name,
@@ -240,10 +494,17 @@
                     contact: phone
                 },
                 notes: {
-                    subject: subject
+                    class: className,
+                    date: date,
+                    time: time
                 },
                 theme: {
-                    color: '#3498db'
+                    color: '#4361ee'
+                },
+                modal: {
+                    ondismiss: function() {
+                        alert('Payment cancelled. Please try again to book your session.');
+                    }
                 }
             };
             
