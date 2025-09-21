@@ -520,7 +520,7 @@
                     document.getElementById('pay-now-btn').disabled = false;
                     
                     // Redirect to confirmation page (SKIPPING Google Sheets for now)
-                    window.location.href = 'https://sagaremmanuel.github.io/JEE/' + 
+                    window.location.href = 'https://sagaremmanuel.github.io/JEE/confirm.html?' + 
                         'payment_id=' + response.razorpay_payment_id + 
                         '&name=' + encodeURIComponent(name) + 
                         '&date=' + encodeURIComponent(formattedDate) + 
