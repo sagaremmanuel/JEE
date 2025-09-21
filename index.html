@@ -7,76 +7,33 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
             .price-tag {
-        position: absolute;
-        top: 20px;
-        right: 30px;
-        background: rgba(255, 255, 255, 0.15);
-        backdrop-filter: blur(10px);
-        padding: 8px 16px;
-        border-radius: 50px;
-        font-weight: 700;
-        font-size: 1.2rem;
-        z-index: 2;
-        color: white;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        animation: pulse 2s infinite, float 3s ease-in-out infinite;
-        transform-origin: center;
-    }
-    
-    @keyframes pulse {
-        0% { 
-            transform: scale(1);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-        50% { 
-            transform: scale(1.1);
-            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.4);
-        }
-        100% { 
-            transform: scale(1);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-    }
-    
-    @keyframes float {
-        0% { transform: translateY(0px) scale(1); }
-        50% { transform: translateY(-5px) scale(1.05); }
-        100% { transform: translateY(0px) scale(1); }
-    }
-    
-    .price-tag::before {
-        content: '';
-        position: absolute;
-        top: -2px;
-        left: -2px;
-        right: -2px;
-        bottom: -2px;
-        background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3, #54a0ff);
-        background-size: 400% 400%;
-        border-radius: 50px;
-        z-index: -1;
-        animation: gradientBorder 6s ease infinite;
-        opacity: 0.8;
-    }
-    
-    @keyframes gradientBorder {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
-    
-    .price-tag:hover {
-        animation: pulse 0.5s ease, shake 0.5s ease;
-        transform: scale(1.15);
-    }
-    
-    @keyframes shake {
-        0%, 100% { transform: translateX(0) scale(1.15); }
-        25% { transform: translateX(-3px) scale(1.15); }
-        50% { transform: translateX(0) scale(1.15); }
-        75% { transform: translateX(3px) scale(1.15); }
-    }
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px); /* For Safari support */
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1.2rem;
+    z-index: 2;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    animation: pulse 2s infinite, float 3s ease-in-out infinite;
+    transform-origin: center;
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Optional: adds a subtle border */
+}
+
+/* Keep the backdrop-filter property in all states */
+.price-tag:hover {
+    background: rgba(255, 255, 255, 0.2); /* Slightly more opaque on hover */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    animation: pulse 0.5s ease, shake 0.5s ease;
+    transform: scale(1.15);
+}
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap');
         
         :root {
