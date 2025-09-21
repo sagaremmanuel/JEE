@@ -22,16 +22,71 @@
             box-sizing: border-box;
         }
         
+        /* Navigation Bar Styles */
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+        
+        .logo {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 25px;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        /* Main Content Styles */
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
             color: var(--dark);
             line-height: 1.6;
-            padding: 10px;
             min-height: 100vh;
+        }
+        
+        .main-content {
+            padding: 30px 20px;
             display: flex;
             justify-content: center;
             align-items: center;
+            min-height: calc(100vh - 80px);
         }
         
         .container {
@@ -244,18 +299,6 @@
             transform: translateY(0);
         }
         
-        .calendar-cta {
-            text-align: center;
-            margin-top: 25px;
-            padding-top: 25px;
-            border-top: 1px solid #eee;
-        }
-        
-        .calendar-cta p {
-            margin-bottom: 20px;
-            color: #666;
-        }
-        
         .next-steps {
             margin-top: 30px;
             background: #fff8e1;
@@ -301,109 +344,112 @@
     </style>
 </head>
 <body>
-            <!-- Add this navigation menu at the top of your confirm.html file, inside the <body> tag -->
-    <header style="background: white; padding: 15px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-        <nav style="max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center;">
-            <div style="font-weight: 700; font-size: 1.3rem; color: #3a0ca3;">
-                JEE Mentorship
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-content">
+                <a href="index.html" class="logo">JEE Mentorship</a>
+                <ul class="nav-links">
+                    <li><a href="terms.html">Terms</a></li>
+                    <li><a href="privacy.html">Privacy</a></li>
+                    <li><a href="refund.html">Refund Policy</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                </ul>
             </div>
-            <ul style="display: flex; list-style: none; gap: 25px; margin: 0; padding: 0;">
-                <li><a href="index.html" style="text-decoration: none; color: #333;">Home</a></li>
-                <li><a href="terms.html" style="text-decoration: none; color: #333;">Terms</a></li>
-                <li><a href="privacy.html" style="text-decoration: none; color: #333;">Privacy</a></li>
-                <li><a href="refund.html" style="text-decoration: none; color: #333;">Refund Policy</a></li>
-                <li><a href="contact.html" style="text-decoration: none; color: #333;">Contact Us</a></li>
-            </ul>
-        </nav>
-    </header>
-    <div class="container">
-        <div class="success-header">
-            <div class="success-icon">
-                <i class="fas fa-check"></i>
-            </div>
-            <h1>Session Booked Successfully!</h1>
-            <p>Your payment has been processed and your mentorship session is confirmed.</p>
         </div>
-        
-        <div class="content">
-            <div class="session-details">
-                <h2><i class="fas fa-chalkboard-teacher"></i> Session Details</h2>
-                <div class="detail-item">
-                    <span class="detail-label">Student Name:</span>
-                    <span class="detail-value" id="student-name">Loading...</span>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+            <div class="success-header">
+                <div class="success-icon">
+                    <i class="fas fa-check"></i>
                 </div>
-                <div class="detail-item">
-                    <span class="detail-label">Mentors:</span>
-                    <span class="detail-value">Sagar & Sanjay</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Date:</span>
-                    <span class="detail-value" id="session-date">Loading...</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Time:</span>
-                    <span class="detail-value" id="session-time">Loading...</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Duration:</span>
-                    <span class="detail-value">1 Hour</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Amount Paid:</span>
-                    <span class="detail-value">₹70</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Payment ID:</span>
-                    <span class="detail-value" id="payment-id">Loading...</span>
-                </div>
+                <h1>Session Booked Successfully!</h1>
+                <p>Your payment has been processed and your mentorship session is confirmed.</p>
             </div>
             
-            <div class="whatsapp-group">
-                <h3><i class="fab fa-whatsapp"></i> Join Our WhatsApp Group</h3>
-                <p>Join our WhatsApp group for important updates, study materials, and session reminders:</p>
-                <a href="https://chat.whatsapp.com/EqKwt79v2YMLFzvmKwNktn?mode=ems_copy_t" class="whatsapp-link" target="_blank">
-                    <i class="fab fa-whatsapp"></i> Join WhatsApp Group
-                </a>
-                <p style="font-size: 0.9rem; margin-top: 15px;">Scan the QR code or click the button above to join</p>
-            </div>
-            
-            <div class="important-note">
-                <h3><i class="fas fa-exclamation-circle"></i> Important Information</h3>
-                <p>✅ You will receive a confirmation email with the Google Meet link within 5 minutes.</p>
-                <p>✅ Please check your spam folder if you don't see the email in your inbox.</p>
-                <p>✅ Login 5 minutes before your scheduled time to ensure a smooth session.</p>
-                <p>✅ Contact support at <strong>sshelp37@gmail.com</strong> if you face any issues.</p>
-            </div>
-            
-            <div class="next-steps">
-                <h3><i class="fas fa-clipboard-list"></i> Next Steps</h3>
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <div>
-                        <strong>Join WhatsApp Group</strong>
-                        <p>Click the button above to join our WhatsApp group for updates and resources.</p>
+            <div class="content">
+                <div class="session-details">
+                    <h2><i class="fas fa-chalkboard-teacher"></i> Session Details</h2>
+                    <div class="detail-item">
+                        <span class="detail-label">Student Name:</span>
+                        <span class="detail-value" id="student-name">Loading...</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Mentors:</span>
+                        <span class="detail-value">Sagar & Sanjay</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Date:</span>
+                        <span class="detail-value" id="session-date">Loading...</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Time:</span>
+                        <span class="detail-value" id="session-time">Loading...</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Duration:</span>
+                        <span class="detail-value">1 Hour</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Amount Paid:</span>
+                        <span class="detail-value">₹70</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Payment ID:</span>
+                        <span class="detail-value" id="payment-id">Loading...</span>
                     </div>
                 </div>
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <div>
-                        <strong>Check Your Email</strong>
-                        <p>Look for a confirmation email with the meeting link and session details.</p>
+                
+                <div class="whatsapp-group">
+                    <h3><i class="fab fa-whatsapp"></i> Join Our WhatsApp Group</h3>
+                    <p>Join our WhatsApp group for important updates, study materials, and session reminders:</p>
+                    <a href="https://chat.whatsapp.com/YOUR_GROUP_LINK" class="whatsapp-link" target="_blank">
+                        <i class="fab fa-whatsapp"></i> Join WhatsApp Group
+                    </a>
+                    <p style="font-size: 0.9rem; margin-top: 15px;">Scan the QR code or click the button above to join</p>
+                </div>
+                
+                <div class="important-note">
+                    <h3><i class="fas fa-exclamation-circle"></i> Important Information</h3>
+                    <p>✅ You will receive a confirmation email with the Google Meet link within 5 minutes.</p>
+                    <p>✅ Please check your spam folder if you don't see the email in your inbox.</p>
+                    <p>✅ Login 5 minutes before your scheduled time to ensure a smooth session.</p>
+                    <p>✅ Contact support at <strong>sshelp37@gmail.com</strong> if you face any issues.</p>
+                </div>
+                
+                <div class="next-steps">
+                    <h3><i class="fas fa-clipboard-list"></i> Next Steps</h3>
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div>
+                            <strong>Join WhatsApp Group</strong>
+                            <p>Click the button above to join our WhatsApp group for updates and resources.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div>
+                            <strong>Check Your Email</strong>
+                            <p>Look for a confirmation email with the meeting link and session details.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div>
+                            <strong>Prepare for Your Session</strong>
+                            <p>Write down your questions and have your study materials ready.</p>
+                        </div>
                     </div>
                 </div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <div>
-                        <strong>Prepare for Your Session</strong>
-                        <p>Write down your questions and have your study materials ready.</p>
-                    </div>
+                
+                <div class="actions">
+                    <a href="index.html" class="btn btn-outline">
+                        <i class="fas fa-home"></i> Back to Home
+                    </a>
                 </div>
-            </div>
-            
-            <div class="actions">
-                <a href="index.html" class="btn btn-outline">
-                    <i class="fas fa-home"></i> Back to Home
-                </a>
             </div>
         </div>
     </div>
