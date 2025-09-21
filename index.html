@@ -675,75 +675,29 @@
                     document.getElementById('pay-now-btn').disabled = false;
                     
                     // Save to Google Sheets
-                        function saveToGoogleSheets(name, email, phone, className, date, time, topic, amount, paymentId, formattedDate, formattedTime) {
-        console.log('Saving to Google Sheets...');
-        console.log('Data to save:', {name, email, phone, className, date, time, topic, amount, paymentId});
-        
-        // Create form data for Google Apps Script
-        const formData = new FormData();
-        formData.append('name', name);
-        formData.append('email', email);
-        formData.append('phone', phone);
-        formData.append('class', className);
-        formData.append('date', date);
-        formData.append('time', time);
-        formData.append('topic', topic);
-        formData.append('amount', amount);
-        formData.append('paymentId', paymentId);
-        formData.append('status', 'Confirmed');
-        
-        // YOUR GOOGLE APPS SCRIPT URL
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbyo4GBDGjvIKz9yRnqLZvkiZEh3PQ6ekE0SKUyu-27KeuTHCmQAnwI2uHzFS6mUaJyBQQ/exec';
-        
-        fetch(scriptURL, {
-            method: 'POST',
-            mode: 'cors'
-        })
-        .then(response => {
-            console.log('Response status:', response.status);
-            console.log('Response headers:', [...response.headers.entries()]);
-            return response.text(); // Get response as text first to debug
-        })
-        .then(text => {
-            console.log('Raw response:', text);
-            
-            // Check if response contains HTML (sign-in page)
-            if (text.includes('<html') || text.includes('Sign in') || text.includes('登录') || text.includes('signin')) {
-                throw new Error('Google Apps Script requires authentication. Please update deployment settings to "Anyone".');
-            }
-            
-            // Try to parse as JSON
-            try {
-                const data = JSON.parse(text);
-                console.log('Success:', data);
-                // Redirect to confirmation page
-                window.location.href = 'https://sagaremmanuel.github.io/JEE/confirm.html?' + 
-                                     'payment_id=' + paymentId + 
-                                     '&name=' + encodeURIComponent(name) + 
-                                     '&date=' + encodeURIComponent(formattedDate) + 
-                                     '&time=' + encodeURIComponent(formattedTime);
-            } catch (jsonError) {
-                console.error('JSON parse error:', jsonError);
-                // Redirect to confirmation page even if Google Sheets fails
-                alert('Payment successful but there was an issue saving your details. Please contact support.');
-                window.location.href = 'https://sagaremmanuel.github.io/JEE/confirm.html?' + 
-                                     'payment_id=' + paymentId + 
-                                     '&name=' + encodeURIComponent(name) + 
-                                     '&date=' + encodeURIComponent(formattedDate) + 
-                                     '&time=' + encodeURIComponent(formattedTime);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            // Redirect to confirmation page even if Google Sheets fails
-            alert('Payment successful but there was an issue saving your details. Please contact support with Payment ID: ' + paymentId);
-            window.location.href = 'https://sagaremmanuel.github.io/JEE/confirm.html?' + 
-                                 'payment_id=' + paymentId + 
-                                 '&name=' + encodeURIComponent(name) + 
-                                 '&date=' + encodeURIComponent(formattedDate) + 
-                                 '&time=' + encodeURIComponent(formattedTime);
-        });
-    }
+                        saveToGoogleSheets(name, email, phone, className, topic, 70, response.razorpay_payment_id, fixedDate, fixedTime);
+                },
+                prefill: {
+                    name: name,
+                    email: email,
+                    contact: phone
+                },
+                notes: {
+                    class: className,
+                    topic: topic
+                },
+                theme: {
+                    color: '#4361ee'
+                },
+                modal: {
+                    ondismiss: function() {
+                        // Hide loading indicator
+                        document.getElementById('loading-indicator').classList.remove('active');
+                        document.getElementById('pay-now-btn').disabled = false;
+                        alert('Payment cancelled. Please try again to book your session.');
+                    }
+                }
+            };
             
             // Add error handling
             try {
