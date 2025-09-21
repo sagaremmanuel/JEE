@@ -204,7 +204,7 @@
         
         select.form-control {
             appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%234361ee' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-image: url("image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%234361ee' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 16px center;
             padding-right: 40px;
@@ -301,6 +301,19 @@
             font-size: 0.9rem;
         }
         
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            background: rgba(67, 97, 238, 0.1);
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .loading.active {
+            display: block;
+        }
+        
         @media (max-width: 768px) {
             .container {
                 border-radius: 15px;
@@ -378,12 +391,28 @@
                     <div class="info-box">
                         <i class="fas fa-lightbulb"></i>
                         <div>
-                            <strong>Important Note:</strong> The session is 1hr long and conducted online. 
+                            <strong>Important Note:</strong> All sessions are 45 minutes long and conducted online. 
                             You'll receive a confirmation email with the meeting link after successful payment.
                         </div>
                     </div>
                     
-                
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="date"><i class="fas fa-calendar"></i> Preferred Date *</label>
+                            <input type="date" id="date" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="time"><i class="fas fa-clock"></i> Preferred Time Slot *</label>
+                            <select id="time" class="form-control" required>
+                                <option value="">Select time slot</option>
+                                <option value="slot1">4:00 PM - 4:45 PM</option>
+                                <option value="slot2">5:00 PM - 5:45 PM</option>
+                                <option value="slot3">6:00 PM - 6:45 PM</option>
+                                <option value="slot4">7:00 PM - 7:45 PM</option>
+                                <option value="slot5">8:00 PM - 8:45 PM</option>
+                            </select>
+                        </div>
+                    </div>
                     
                     <div class="form-group">
                         <label for="topic"><i class="fas fa-book"></i> Specific Topic or Question (Optional)</label>
@@ -394,7 +423,7 @@
                 <div class="payment-summary">
                     <h3>Payment Summary</h3>
                     <div class="price-row border-bottom">
-                        <span>Mentorship Session (1hr)</span>
+                        <span>Mentorship Session (45 mins)</span>
                         <span>₹70</span>
                     </div>
                     <div class="price-row">
@@ -405,6 +434,10 @@
                         <span>Total Payable Amount</span>
                         <span>₹70</span>
                     </div>
+                </div>
+                
+                <div class="loading" id="loading-indicator">
+                    <i class="fas fa-spinner fa-spin"></i> Processing your booking...
                 </div>
                 
                 <button type="button" id="pay-now-btn" class="btn">
@@ -441,13 +474,18 @@
                 return;
             }
             
+            // Show loading indicator
+            document.getElementById('loading-indicator').classList.add('active');
+            document.getElementById('pay-now-btn').disabled = true;
+            
             // Get form data
             const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
             const phone = document.getElementById('phone').value;
-            const className = document.getElementById('class').options[document.getElementById('class').selectedIndex].text;
+            const className = document.getElementById('class').value;
             const date = document.getElementById('date').value;
-            const time = document.getElementById('time').options[document.getElementById('time').selectedIndex].text;
+            const time = document.getElementById('time').value;
+            const topic = document.getElementById('topic').value || 'General JEE Preparation';
             
             // Format date for display
             const formattedDate = new Date(date).toLocaleDateString('en-IN', {
@@ -457,20 +495,27 @@
                 day: 'numeric'
             });
             
+            // Map time slot to display value
+            const timeSlots = {
+                'slot1': '4:00 PM - 4:45 PM',
+                'slot2': '5:00 PM - 5:45 PM',
+                'slot3': '6:00 PM - 6:45 PM',
+                'slot4': '7:00 PM - 7:45 PM',
+                'slot5': '8:00 PM - 8:45 PM'
+            };
+            const formattedTime = timeSlots[time] || time;
+            
             // Create Razorpay options
             const options = {
-                key: 'rzp_test_1234567890', // Replace with your Razorpay key
+                key: 'rzp_test_1234567890', // Replace with your actual Razorpay key
                 amount: 7000, // ₹70 in paise
                 currency: 'INR',
-                name: 'JEE Mentorship',
-                description: 'Session with Sagar & Sanjay',
-                image: 'https://via.placeholder.com/100x50?text=Logo',
+                name: 'JEE Mentorship with Sagar & Sanjay',
+                description: '45-minute mentorship session',
+                image: 'https://via.placeholder.com/100x50?text=JEE+Logo',
                 handler: function(response) {
-                    // Redirect to confirmation page
-                    window.location.href = 'confirmation.html?payment_id=' + response.razorpay_payment_id + 
-                                         '&name=' + encodeURIComponent(name) + 
-                                         '&date=' + encodeURIComponent(formattedDate) + 
-                                         '&time=' + encodeURIComponent(time);
+                    // Payment successful - now save to Google Sheets
+                    saveToGoogleSheets(name, email, phone, className, date, time, topic, 70, response.razorpay_payment_id, formattedDate, formattedTime);
                 },
                 prefill: {
                     name: name,
@@ -480,13 +525,17 @@
                 notes: {
                     class: className,
                     date: date,
-                    time: time
+                    time: time,
+                    topic: topic
                 },
                 theme: {
                     color: '#4361ee'
                 },
                 modal: {
                     ondismiss: function() {
+                        // Hide loading indicator
+                        document.getElementById('loading-indicator').classList.remove('active');
+                        document.getElementById('pay-now-btn').disabled = false;
                         alert('Payment cancelled. Please try again to book your session.');
                     }
                 }
@@ -496,6 +545,47 @@
             const rzp = new Razorpay(options);
             rzp.open();
         });
+        
+        function saveToGoogleSheets(name, email, phone, className, date, time, topic, amount, paymentId, formattedDate, formattedTime) {
+            // Create form data for Google Apps Script
+            const formData = new FormData();
+            formData.append('name', name);
+            formData.append('email', email);
+            formData.append('phone', phone);
+            formData.append('class', className);
+            formData.append('date', date);
+            formData.append('time', time);
+            formData.append('topic', topic);
+            formData.append('amount', amount);
+            formData.append('paymentId', paymentId);
+            formData.append('status', 'Confirmed');
+            
+            // YOUR GOOGLE APPS SCRIPT URL - Replace with your actual URL
+            const scriptURL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+            
+            fetch(scriptURL, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                // Redirect to confirmation page
+                window.location.href = 'confirmation.html?payment_id=' + paymentId + 
+                                     '&name=' + encodeURIComponent(name) + 
+                                     '&date=' + encodeURIComponent(formattedDate) + 
+                                     '&time=' + encodeURIComponent(formattedTime);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Still redirect to confirmation but show error message
+                alert('Payment successful but there was an issue saving your details. Please contact support with Payment ID: ' + paymentId);
+                window.location.href = 'confirmation.html?payment_id=' + paymentId + 
+                                     '&name=' + encodeURIComponent(name) + 
+                                     '&date=' + encodeURIComponent(formattedDate) + 
+                                     '&time=' + encodeURIComponent(formattedTime);
+            });
+        }
     </script>
 </body>
 </html>
