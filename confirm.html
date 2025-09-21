@@ -72,6 +72,44 @@
             color: var(--primary);
         }
         
+        /* Hamburger Menu for Mobile */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+        }
+        
+        .hamburger div {
+            width: 25px;
+            height: 3px;
+            background-color: var(--dark);
+            margin: 3px;
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-menu {
+            position: fixed;
+            top: 70px;
+            right: -100%;
+            width: 80%;
+            max-width: 300px;
+            height: calc(100vh - 70px);
+            background: white;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+            padding: 30px 20px;
+            transition: right 0.3s ease;
+            z-index: 999;
+        }
+        
+        .mobile-menu.active {
+            right: 0;
+        }
+        
+        .mobile-menu .nav-links {
+            flex-direction: column;
+            gap: 20px;
+        }
+        
         /* Main Content Styles */
         body {
             font-family: 'Poppins', sans-serif;
@@ -262,6 +300,15 @@
             .actions {
                 flex-direction: column;
             }
+            
+            /* Hide desktop nav, show hamburger */
+            .nav-links {
+                display: none;
+            }
+            
+            .hamburger {
+                display: flex;
+            }
         }
         
         .btn {
@@ -349,13 +396,32 @@
         <div class="nav-container">
             <div class="nav-content">
                 <a href="index.html" class="logo">JEE Mentorship</a>
+                
+                <!-- Desktop Navigation -->
                 <ul class="nav-links">
                     <li><a href="terms.html">Terms</a></li>
                     <li><a href="privacy.html">Privacy</a></li>
                     <li><a href="refund.html">Refund Policy</a></li>
                     <li><a href="contact.html">Contact Us</a></li>
                 </ul>
+                
+                <!-- Hamburger Menu for Mobile -->
+                <div class="hamburger">
+                    <div class="line1"></div>
+                    <div class="line2"></div>
+                    <div class="line3"></div>
+                </div>
             </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div class="mobile-menu">
+            <ul class="nav-links">
+                <li><a href="terms.html">Terms</a></li>
+                <li><a href="privacy.html">Privacy</a></li>
+                <li><a href="refund.html">Refund Policy</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+            </ul>
         </div>
     </nav>
 
@@ -455,6 +521,26 @@
     </div>
 
     <script>
+        // Mobile menu toggle
+        const hamburger = document.querySelector('.hamburger');
+        const mobileMenu = document.querySelector('.mobile-menu');
+        
+        hamburger.addEventListener('click', function() {
+            mobileMenu.classList.toggle('active');
+            
+            // Animate hamburger to X
+            hamburger.classList.toggle('active');
+        });
+        
+        // Close mobile menu when clicking on a link
+        const mobileLinks = document.querySelectorAll('.mobile-menu .nav-links a');
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                mobileMenu.classList.remove('active');
+                hamburger.classList.remove('active');
+            });
+        });
+        
         document.addEventListener('DOMContentLoaded', function() {
             // Get URL parameters
             const urlParams = new URLSearchParams(window.location.search);
