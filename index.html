@@ -585,17 +585,25 @@
         </div>
     </div>
 
-    <!-- Chatbot-->
-
-        <script src="chatbot-embed.js"></script>
+    <!-- Chatbot Integration -->
+    <script src="chatbot-embed.js"></script>
     <script>
     ChatbotEmbed.init({
-        botName: 'Support Bot',
-        welcomeMessage: 'Hi! How can I help you?',
-        companyName: 'Your Company',
-        primaryColor: '#007bff'
+        botName: 'Mentorship Support',
+        welcomeMessage: 'Hi! Need help with our mentorship program?',
+        companyName: 'Sagar & Sanjay Mentorship',
+        primaryColor: '#4361ee',
+        secondaryColor: '#3a0ca3',
+        position: 'bottom-right',
+        responses: {
+            'price': 'Our mentorship session is ₹500. Great value for personalized guidance!',
+            'booking': 'Click the "Book Now" button above to schedule your session.',
+            'mentors': 'You\'ll be mentored by Sagar and Sanjay, experienced professionals.',
+            'duration': 'Each mentorship session lasts approximately 1 hour.',
+            'topics': 'We cover career guidance, skill development, and professional growth.'
+        }
     });
-</script>
+    </script>
 
     <!-- Razorpay Script -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -819,10 +827,7 @@
             alert('Error: ' + error.message);
         }
     });
-
-            //Chatbot will appear here -->
-        <script src="path/to/chatbot.js"></script>
-</script>
+    </script>
     
 </body>
 </html>
