@@ -798,18 +798,103 @@
 
             generateResponse: function(message) {
                 const responses = {
-                    'hello': 'Hello! How can I help you today?',
-                    'hi': 'Hi there! What can I do for you?',
-                    'help': 'I\'m here to help! What do you need assistance with?',
-                    'hours': 'Our business hours are Monday-Friday 9AM-6PM.',
-                    'contact': 'You can reach us at support@yourcompany.com'
+                    // Greetings
+                    'hello': 'Hello! How can I help you with your JEE mentorship today?',
+                    'hi': 'Hi there! What can I do for you regarding our mentorship program?',
+                    'hey': 'Hey! How can I assist you with your JEE preparation?',
+                    
+                    // Help and general
+                    'help': 'I can help you with information about our mentorship session, pricing, booking, and more!',
+                    'what': 'I can tell you about our mentorship program, pricing, session details, and how to book!',
+                    
+                    // Price related
+                    'cost': 'Our mentorship session costs ₹70 only! Great value for 1-hour personalized guidance.',
+                    'fee': 'The session fee is just ₹70 for a complete 1-hour mentorship session.',
+                    'money': 'Our mentorship session is priced at ₹70 only - very affordable for quality guidance!',
+                    
+                    // Session details
+                    'when': 'The mentorship session is scheduled for 5th October 2025 at 9:00 PM IST.',
+                    'time': 'Session time is 9:00 PM IST on 5th October 2025.',
+                    'date': 'The session is on 5th October 2025 at 9:00 PM IST.',
+                    'schedule': 'Our mentorship session is scheduled for 5th October 2025 at 9:00 PM IST.',
+                    
+                    // Duration and platform
+                    'long': 'Each mentorship session lasts for 1 full hour.',
+                    'platform': 'The session will be conducted on Google Meet platform.',
+                    'meet': 'Yes, we use Google Meet for our mentorship sessions.',
+                    
+                    // Booking process
+                    'book': 'To book your session, fill out the form above and click "Pay ₹70 & Book Session" button.',
+                    'register': 'Just fill the registration form above and make the payment to secure your spot!',
+                    'payment': 'We accept payments through Razorpay - it\'s 100% secure and instant.',
+                    
+                    // About mentors
+                    'sagar': 'Sagar is one of our experienced mentors who will guide you in your JEE preparation.',
+                    'sanjay': 'Sanjay is our expert mentor with extensive experience in JEE coaching.',
+                    'mentor': 'You\'ll be mentored by both Sagar and Sanjay - experienced professionals in JEE preparation.',
+                    'teacher': 'Our mentors are experienced teachers specializing in JEE preparation and guidance.',
+                    
+                    // Contact and support
+                    'contact': 'You can contact us through this chat or fill out the booking form above.',
+                    'support': 'I\'m here to support you! Ask me anything about our mentorship program.',
+                    'whatsapp': 'After successful payment, you\'ll get access to our WhatsApp group for updates.',
+                    
+                    // JEE specific
+                    'jee': 'Our mentorship focuses on JEE Main and Advanced preparation strategies and guidance.',
+                    'exam': 'We provide guidance for JEE Main and JEE Advanced examinations.',
+                    'preparation': 'Our mentors will help you with effective JEE preparation strategies and study plans.',
+                    'study': 'Get personalized study plans and preparation strategies from our expert mentors.',
+                    
+                    // Refund and guarantee
+                    'refund': 'We offer 100% money back guarantee if the session is not conducted as promised.',
+                    'guarantee': 'Yes, we provide 100% money back guarantee for your peace of mind.',
+                    
+                    // Goodbye
+                    'bye': 'Goodbye! Don\'t forget to book your mentorship session. Good luck with your JEE prep!',
+                    'thanks': 'You\'re welcome! Feel free to ask if you have any other questions about our mentorship program.'
                 };
+                
                 const allResponses = Object.assign(responses, this.config.responses);
                 const lowerMessage = message.toLowerCase();
+                
+                // First try exact keyword matching
                 for (const [key, response] of Object.entries(allResponses)) {
-                    if (lowerMessage.includes(key)) return response;
+                    if (lowerMessage.includes(key)) {
+                        return response;
+                    }
                 }
-                return 'I\'m not sure about that. Could you please rephrase or contact our support team?';
+                
+                // Then try pattern matching for common questions
+                if (lowerMessage.match(/how much|price|cost|fee|money|₹|rupees/)) {
+                    return 'Our mentorship session costs just ₹70! It\'s a great value for 1-hour personalized JEE guidance.';
+                }
+                
+                if (lowerMessage.match(/when|time|date|schedule/)) {
+                    return 'The mentorship session is scheduled for 5th October 2025 at 9:00 PM IST.';
+                }
+                
+                if (lowerMessage.match(/how to|book|register|join/)) {
+                    return 'To book: 1) Fill the form above 2) Click "Pay ₹70 & Book Session" 3) Complete payment. You\'ll get WhatsApp group access after payment!';
+                }
+                
+                if (lowerMessage.match(/mentor|teacher|sagar|sanjay/)) {
+                    return 'You\'ll be mentored by Sagar and Sanjay - both are experienced professionals with expertise in JEE preparation and guidance.';
+                }
+                
+                if (lowerMessage.match(/jee|exam|preparation|study/)) {
+                    return 'Our mentorship covers JEE Main & Advanced preparation, study strategies, time management, and personalized guidance for your success!';
+                }
+                
+                if (lowerMessage.match(/duration|long|hour/)) {
+                    return 'Each mentorship session is 1 full hour long - enough time for detailed discussion and personalized guidance.';
+                }
+                
+                if (lowerMessage.match(/platform|where|google meet|meeting/)) {
+                    return 'The session will be conducted on Google Meet. You\'ll receive the meeting link after successful payment.';
+                }
+                
+                // Default response with helpful suggestions
+                return 'I can help you with: Session price (₹70), booking process, session timing (5th Oct, 9 PM), mentors info, or JEE preparation guidance. What would you like to know?';
             }
         };
 
