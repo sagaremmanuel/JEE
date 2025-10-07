@@ -796,105 +796,213 @@
                 container.scrollTop = container.scrollHeight;
             },
 
+            // AI-powered content analysis
+            analyzeWebsiteContent: function() {
+                const content = {
+                    title: document.title || '',
+                    price: this.extractPrice(),
+                    date: this.extractDate(),
+                    time: this.extractTime(),
+                    mentors: this.extractMentors(),
+                    formFields: this.getFormFields(),
+                    pageStructure: this.analyzePageStructure(),
+                    userProgress: this.trackUserProgress()
+                };
+                return content;
+            },
+
+            extractPrice: function() {
+                const priceElements = document.querySelectorAll('.price-tag, .total, [class*="price"], [class*="cost"]');
+                const prices = [];
+                priceElements.forEach(el => {
+                    const text = el.textContent.match(/₹\s*(\d+)/);
+                    if (text) prices.push(text[1]);
+                });
+                return prices.length > 0 ? prices[0] : '70';
+            },
+
+            extractDate: function() {
+                const dateRegex = /(\d{1,2}(?:st|nd|rd|th)?\s+(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4})/gi;
+                const pageText = document.body.textContent;
+                const dates = pageText.match(dateRegex);
+                return dates ? dates[0] : '5th October 2025';
+            },
+
+            extractTime: function() {
+                const timeRegex = /(\d{1,2}:\d{2}\s*(?:AM|PM)\s*(?:IST|UTC)?)/gi;
+                const pageText = document.body.textContent;
+                const times = pageText.match(timeRegex);
+                return times ? times[0] : '9:00 PM IST';
+            },
+
+            extractMentors: function() {
+                const mentorElements = document.querySelectorAll('.mentor, [class*="mentor"]');
+                const mentors = [];
+                mentorElements.forEach(el => {
+                    const name = el.textContent.trim();
+                    if (name && !mentors.includes(name)) {
+                        mentors.push(name);
+                    }
+                });
+                return mentors.length > 0 ? mentors : ['Sagar', 'Sanjay'];
+            },
+
+            getFormFields: function() {
+                const inputs = document.querySelectorAll('input, select, textarea');
+                const fields = [];
+                inputs.forEach(input => {
+                    if (input.id && input.placeholder) {
+                        fields.push({
+                            id: input.id,
+                            placeholder: input.placeholder,
+                            required: input.required
+                        });
+                    }
+                });
+                return fields;
+            },
+
+            analyzePageStructure: function() {
+                return {
+                    hasForm: document.querySelector('form') !== null,
+                    hasPaymentButton: document.querySelector('#pay-now-btn') !== null,
+                    hasNavigation: document.querySelector('nav') !== null,
+                    sections: document.querySelectorAll('div[class*="section"], .form-step').length
+                };
+            },
+
+            trackUserProgress: function() {
+                const form = document.querySelector('#registration-form');
+                if (!form) return { completed: 0, total: 0 };
+                
+                const requiredFields = form.querySelectorAll('[required]');
+                let completed = 0;
+                requiredFields.forEach(field => {
+                    if (field.value.trim()) completed++;
+                });
+                
+                return {
+                    completed: completed,
+                    total: requiredFields.length,
+                    percentage: Math.round((completed / requiredFields.length) * 100)
+                };
+            },
+
+            generateIntelligentResponse: function(message, websiteData) {
+                const lowerMessage = message.toLowerCase();
+                
+                // Context-aware responses based on user progress
+                if (websiteData.userProgress.total > 0 && lowerMessage.match(/help|stuck|form/)) {
+                    const progress = websiteData.userProgress;
+                    if (progress.percentage < 50) {
+                        return `I see you've started filling the form (${progress.completed}/${progress.total} fields completed). Need help with any specific field? I can guide you through the registration process.`;
+                    } else if (progress.percentage < 100) {
+                        return `You're almost done! You've filled ${progress.completed} out of ${progress.total} required fields. Just complete the remaining fields and you can proceed to payment.`;
+                    } else {
+                        return `Great! You've completed all required fields. Ready to book your session? Just click the "Pay ₹${websiteData.price} & Book Session" button to proceed.`;
+                    }
+                }
+
+                // Dynamic price responses
+                if (lowerMessage.match(/price|cost|fee|money|₹|rupees/)) {
+                    return `The mentorship session costs ₹${websiteData.price}. This includes a full 1-hour session with ${websiteData.mentors.join(' and ')}, WhatsApp group access, and 100% money-back guarantee if not conducted.`;
+                }
+
+                // Dynamic date/time responses
+                if (lowerMessage.match(/when|time|date|schedule/)) {
+                    return `The session is scheduled for ${websiteData.date} at ${websiteData.time}. Make sure to mark your calendar!`;
+                }
+
+                // Smart booking guidance
+                if (lowerMessage.match(/book|register|how to|steps/)) {
+                    const progress = websiteData.userProgress;
+                    if (progress.percentage === 0) {
+                        return `To book your session: 1) Fill out your details in the form above (name, email, phone, class) 2) Click "Pay ₹${websiteData.price} & Book Session" 3) Complete secure payment. You'll get WhatsApp access immediately!`;
+                    } else {
+                        return `I see you've started the booking process. Complete the remaining ${progress.total - progress.completed} fields, then click the payment button to secure your spot for ${websiteData.date}!`;
+                    }
+                }
+
+                // Mentor information with context
+                if (lowerMessage.match(/mentor|teacher|who/)) {
+                    return `Your mentors are ${websiteData.mentors.join(' and ')} - both experienced JEE professionals. They'll provide personalized guidance during your 1-hour session on ${websiteData.date}.`;
+                }
+
+                return null; // Return null if no intelligent response found
+            },
+
             generateResponse: function(message) {
+                // Analyze current website content
+                const websiteData = this.analyzeWebsiteContent();
+                
+                // Try intelligent response first
+                const intelligentResponse = this.generateIntelligentResponse(message, websiteData);
+                if (intelligentResponse) {
+                    return intelligentResponse;
+                }
+
+                // Fallback to static responses
                 const responses = {
-                    // Greetings
-                    'hello': 'Hello! How can I help you with your JEE mentorship today?',
-                    'hi': 'Hi there! What can I do for you regarding our mentorship program?',
-                    'hey': 'Hey! How can I assist you with your JEE preparation?',
+                    // Greetings with context
+                    'hello': `Hello! I can see you're interested in the JEE mentorship session scheduled for ${websiteData.date}. How can I help you get started?`,
+                    'hi': `Hi there! Ready to book your mentorship session with ${websiteData.mentors.join(' and ')}? What would you like to know?`,
+                    'hey': `Hey! I notice this is a JEE mentorship booking page. Need help with registration or have questions about the session?`,
                     
-                    // Help and general
-                    'help': 'I can help you with information about our mentorship session, pricing, booking, and more!',
-                    'what': 'I can tell you about our mentorship program, pricing, session details, and how to book!',
+                    // Help with context awareness
+                    'help': 'I can help you with the booking process, answer questions about the session, or guide you through form completion. What do you need assistance with?',
                     
-                    // Price related
-                    'cost': 'Our mentorship session costs ₹70 only! Great value for 1-hour personalized guidance.',
-                    'fee': 'The session fee is just ₹70 for a complete 1-hour mentorship session.',
-                    'money': 'Our mentorship session is priced at ₹70 only - very affordable for quality guidance!',
+                    // JEE specific with smart context
+                    'jee': `This mentorship focuses on JEE Main & Advanced preparation. ${websiteData.mentors.join(' and ')} will provide personalized strategies during your ${websiteData.date} session.`,
+                    'exam': `The session covers JEE Main and Advanced exam strategies, time management, and subject-specific guidance tailored to your current class level.`,
+                    'preparation': `Get personalized JEE preparation strategies from experienced mentors. The session on ${websiteData.date} will be customized based on your specific needs and current preparation level.`,
                     
-                    // Session details
-                    'when': 'The mentorship session is scheduled for 5th October 2025 at 9:00 PM IST.',
-                    'time': 'Session time is 9:00 PM IST on 5th October 2025.',
-                    'date': 'The session is on 5th October 2025 at 9:00 PM IST.',
-                    'schedule': 'Our mentorship session is scheduled for 5th October 2025 at 9:00 PM IST.',
+                    // Platform and logistics
+                    'platform': `The session will be on Google Meet. After payment, you'll receive the meeting link and WhatsApp group access for ${websiteData.date} at ${websiteData.time}.`,
+                    'meet': `Yes, we use Google Meet for the live session. You'll get all joining details after successful payment.`,
                     
-                    // Duration and platform
-                    'long': 'Each mentorship session lasts for 1 full hour.',
-                    'platform': 'The session will be conducted on Google Meet platform.',
-                    'meet': 'Yes, we use Google Meet for our mentorship sessions.',
-                    
-                    // Booking process
-                    'book': 'To book your session, fill out the form above and click "Pay ₹70 & Book Session" button.',
-                    'register': 'Just fill the registration form above and make the payment to secure your spot!',
-                    'payment': 'We accept payments through Razorpay - it\'s 100% secure and instant.',
-                    
-                    // About mentors
-                    'sagar': 'Sagar is one of our experienced mentors who will guide you in your JEE preparation.',
-                    'sanjay': 'Sanjay is our expert mentor with extensive experience in JEE coaching.',
-                    'mentor': 'You\'ll be mentored by both Sagar and Sanjay - experienced professionals in JEE preparation.',
-                    'teacher': 'Our mentors are experienced teachers specializing in JEE preparation and guidance.',
-                    
-                    // Contact and support
-                    'contact': 'You can contact us through this chat or fill out the booking form above.',
-                    'support': 'I\'m here to support you! Ask me anything about our mentorship program.',
-                    'whatsapp': 'After successful payment, you\'ll get access to our WhatsApp group for updates.',
-                    
-                    // JEE specific
-                    'jee': 'Our mentorship focuses on JEE Main and Advanced preparation strategies and guidance.',
-                    'exam': 'We provide guidance for JEE Main and JEE Advanced examinations.',
-                    'preparation': 'Our mentors will help you with effective JEE preparation strategies and study plans.',
-                    'study': 'Get personalized study plans and preparation strategies from our expert mentors.',
+                    // Payment and security
+                    'payment': `Payment is processed securely through Razorpay. We accept all major payment methods and provide instant confirmation for your ${websiteData.date} session.`,
+                    'safe': 'Absolutely! Payment is 100% secure via Razorpay, and we offer a money-back guarantee if the session is not conducted as promised.',
                     
                     // Refund and guarantee
-                    'refund': 'We offer 100% money back guarantee if the session is not conducted as promised.',
-                    'guarantee': 'Yes, we provide 100% money back guarantee for your peace of mind.',
+                    'refund': 'We provide 100% money-back guarantee if the session is not conducted. Your payment is completely secure.',
+                    'guarantee': 'Yes, complete money-back guarantee for your peace of mind. We\'re committed to delivering quality mentorship.',
                     
                     // Goodbye
-                    'bye': 'Goodbye! Don\'t forget to book your mentorship session. Good luck with your JEE prep!',
-                    'thanks': 'You\'re welcome! Feel free to ask if you have any other questions about our mentorship program.'
+                    'bye': `Goodbye! Don't miss out on this valuable mentorship opportunity on ${websiteData.date}. Book your session before spots fill up!`,
+                    'thanks': 'You\'re welcome! Feel free to ask if you need help with booking or have more questions about the mentorship program.'
                 };
                 
                 const allResponses = Object.assign(responses, this.config.responses);
                 const lowerMessage = message.toLowerCase();
                 
-                // First try exact keyword matching
+                // Keyword matching with enhanced responses
                 for (const [key, response] of Object.entries(allResponses)) {
                     if (lowerMessage.includes(key)) {
                         return response;
                     }
                 }
                 
-                // Then try pattern matching for common questions
+                // Pattern matching with context
                 if (lowerMessage.match(/how much|price|cost|fee|money|₹|rupees/)) {
-                    return 'Our mentorship session costs just ₹70! It\'s a great value for 1-hour personalized JEE guidance.';
+                    return `The session costs ₹${websiteData.price} - excellent value for 1-hour personalized JEE guidance with ${websiteData.mentors.join(' and ')}.`;
                 }
                 
                 if (lowerMessage.match(/when|time|date|schedule/)) {
-                    return 'The mentorship session is scheduled for 5th October 2025 at 9:00 PM IST.';
-                }
-                
-                if (lowerMessage.match(/how to|book|register|join/)) {
-                    return 'To book: 1) Fill the form above 2) Click "Pay ₹70 & Book Session" 3) Complete payment. You\'ll get WhatsApp group access after payment!';
-                }
-                
-                if (lowerMessage.match(/mentor|teacher|sagar|sanjay/)) {
-                    return 'You\'ll be mentored by Sagar and Sanjay - both are experienced professionals with expertise in JEE preparation and guidance.';
-                }
-                
-                if (lowerMessage.match(/jee|exam|preparation|study/)) {
-                    return 'Our mentorship covers JEE Main & Advanced preparation, study strategies, time management, and personalized guidance for your success!';
+                    return `Session: ${websiteData.date} at ${websiteData.time}. Mark your calendar and complete your booking to secure your spot!`;
                 }
                 
                 if (lowerMessage.match(/duration|long|hour/)) {
-                    return 'Each mentorship session is 1 full hour long - enough time for detailed discussion and personalized guidance.';
+                    return `The session is 1 full hour of personalized mentorship - enough time for detailed discussion and customized guidance for your JEE preparation.`;
                 }
                 
-                if (lowerMessage.match(/platform|where|google meet|meeting/)) {
-                    return 'The session will be conducted on Google Meet. You\'ll receive the meeting link after successful payment.';
+                // Smart default response with current context
+                const progress = websiteData.userProgress;
+                if (progress.total > 0 && progress.percentage > 0) {
+                    return `I can help with: Session details (${websiteData.date}, ₹${websiteData.price}), booking process (you're ${progress.percentage}% done), or mentorship content. What interests you?`;
+                } else {
+                    return `I can help you with: Session price (₹${websiteData.price}), booking process, session timing (${websiteData.date}), mentor info, or JEE preparation guidance. What would you like to know?`;
                 }
-                
-                // Default response with helpful suggestions
-                return 'I can help you with: Session price (₹70), booking process, session timing (5th Oct, 9 PM), mentors info, or JEE preparation guidance. What would you like to know?';
             }
         };
 
